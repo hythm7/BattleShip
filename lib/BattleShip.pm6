@@ -1,38 +1,58 @@
 use Grid;
-use BattleShip::ShipFactory;
 use BattleShip::Ship;
+
+enum Fire < Miss Hit >;
+enum Direction < North East South West >;
 
 unit class BattleShip;
 
-has Grid         $!grid handles <grid>;
-has Battle::Ship @!ship;
+has Grid             $!grid handles <grid>;
+has BattleShip::Ship @!ship;
 
 submethod BUILD ( Int :$x = 10, Int :$y = 10 ) {
 
-  $!grid = create-grid( grid-x => $x, grid-y => $y );
+  $!grid  = create-grid( grid-x => $x, grid-y => $y );
+  
+  @!ship.push: BattleShip::Ship.new(Submarine) for ^$x;
+  
   self.place-ships;
 
 }
 
-method hunt ( $ship ) {
+method hunt ( ) {
 
-  my @search-indices = ($!grid.rows X $!grid.columns).grep( -> [$x, $y] { ($x + $y) %% $ship.dimensio } )
+  my @search-indices = (^$!grid.rows X ^$!grid.columns).grep( -> [$x, $y] { ($x + $y) %% Submarine } );
+  
+  for @search-indices -> [ $x, $y ] {
 
+    self.target(:$x, :$y, ship => Submarine) if self.fire( :$x, :$y ) ~~ Hit;
 
+  }
+}
+
+method target ( Int :$x, Int :$y, :$ship ) {
+
+  say "Found ship at ($x, $y)";
 
 }
 
+method fire ( :$x, :$y --> Fire ) {
 
-submethod place-ships ( ) {
-  $!grid[  2,  3,  4 ] = '▬' xx 3 ;
-  $!grid[ 13, 14, 15 ] = '▬' xx 3 ;
-  $!grid[ 56, 57, 58 ] = '▬' xx 3 ;
-  $!grid[ 77, 78, 79 ] = '▬' xx 3 ;
+  return Hit if $!grid.rotor($!grid.columns)[$x][$y].Str ~~ Pieces.enums;
+  return Miss;
 
-  $!grid[ 10, 20, 30 ] = '▮' xx 3 ;
-  $!grid[ 23, 33, 43 ] = '▮' xx 3 ;
-  $!grid[ 66, 76, 86 ] = '▮' xx 3 ;
-  $!grid[ 72, 82, 92 ] = '▮' xx 3 ;
+}
+
+submethod place-ships () {
+
+  $!grid.rotor($!grid.columns)[ 0; 2, 3, 4 ] = @!ship[0].pieces;
+  $!grid.rotor($!grid.columns)[ 1; 3, 4, 5 ] = @!ship[1].pieces;
+  $!grid.rotor($!grid.columns)[ 5; 6, 7, 8 ] = @!ship[2].pieces;
+  $!grid.rotor($!grid.columns)[ 7; 7, 8, 9 ] = @!ship[3].pieces;
+  $!grid.rotor($!grid.columns)[ 1, 2, 3; 0 ] = @!ship[4].pieces;
+  $!grid.rotor($!grid.columns)[ 2, 3, 4; 3 ] = @!ship[5].pieces;
+  $!grid.rotor($!grid.columns)[ 6, 7, 8; 6 ] = @!ship[6].pieces;
+  $!grid.rotor($!grid.columns)[ 7, 8, 9; 2 ] = @!ship[7].pieces;
 
 }
 
