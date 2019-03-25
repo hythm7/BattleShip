@@ -1,40 +1,36 @@
+use BattleShip::Coords;
+use BattleShip::Ship::Piece;
 
 enum State < Swim Sink >;
-enum Type ( Destroyer => 2, Submarine => 3, Cruiser => 4, AircraftCarrier => 5);
-enum Pieces < ■ ✗ ✘ ✓ ✔ ‡ ★ ⚜ ☆ □ ♜ ► ◄ △ ▽ ◉ ◎ ☢ ☯ ☣ >;
+enum ShipType ( Destroyer => 2, Submarine => 3, Cruiser => 4, AircraftCarrier => 5);
 
 unit class BattleShip::Ship;
 
-my class Piece {
-
-  has Bool   $!hit  = False;
-  has Pieces $.shape = Pieces.roll;
-  
-  method Str () {
-    $!shape.Str;
-  }
-
-}
-
-has Type   $.type;
-has State  $.state;
-has Piece  @.pieces;
+has ShipType                $.type;
+has State                   $.state;
+has BattleShip::Ship::Piece @.pieces;
+has BattleShip::Coords      $.coords;
 
 
-method new ( Type $type ) {
+method new ( ShipType $type ) {
 
   self.bless(:$type);
 
 }
 
-submethod BUILD ( :$type ) {
+submethod BUILD ( ShipType :$type ) {
 
   $!type = $type;
   
-  my $shape = Pieces.pick;
-  @!pieces.push: Piece.new(:$shape) for ^$type;
+  my $shape = ShipPiece.pick;
+  @!pieces.push: BattleShip::Ship::Piece.new(:$shape) for ^$type;
   
   $!state = Swim;
 
 }
 
+method coords () {
+
+  @!pieces.map(*.coords);
+
+}
