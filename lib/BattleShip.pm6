@@ -60,23 +60,13 @@ method filter-coords ( ShipType :$ship --> Seq ) {
 
 submethod place-ships () {
 
-  my BattleShip::Coords @coords;
-  #@coords.append: BattleShip::Coords.new(0, 1); 
-  @coords.append: BattleShip::Coords.new(0, 1); 
-  @coords.append: BattleShip::Coords.new(0, 2);
-  @coords.append: BattleShip::Coords.new(0, 3);
+  my BattleShip::Coords $coords = BattleShip::Coords.new: x => (0), y => (1, 2, 3);
 
-  @!ships.push: BattleShip::Ship.new( type => Submarine, :@coords );
+  @!ships.push: BattleShip::Ship.new( type => Submarine, :$coords );
 
-  for @!ships -> $ship {
-    @!plane[.coords.x; .coords.y] = .Str for $ship.pieces;
+  for @!ships {
+    @!plane[.coords.x;.coords.y] = .pieces;
   }
-
-  #for @!ships -> $ship {
-
-    
-
-    #}
 
     #@!plane[ 0; 2, 3, 4 ] = @!ship[0].pieces;
     #@!plane[ 1; 3, 4, 5 ] = @!ship[1].pieces;

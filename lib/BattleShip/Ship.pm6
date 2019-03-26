@@ -8,7 +8,7 @@ unit class BattleShip::Ship;
 
 has Str                     $.name;
 has ShipType                $.type;
-has BattleShip::Coords      @.coords;
+has BattleShip::Coords      $.coords;
 has State                   $!state;
 has BattleShip::Ship::Piece @.pieces;
 
@@ -19,18 +19,18 @@ has BattleShip::Ship::Piece @.pieces;
 
 #}
 
-submethod BUILD ( Str :$name, ShipType :$type, BattleShip::Coords :@coords ) {
+submethod BUILD ( Str :$name, ShipType :$type, BattleShip::Coords :$coords ) {
 
   $!name = 'ship';
 
   $!type = $type;
+  $!coords = $coords;
 
   my $shape = ShipPiece.pick;
 
   for ^$type {
     #@!pieces.push: BattleShip::Ship::Piece.new(:$shape, ) for ^$type;
-    my $coords = @coords.shift;
-    my $piece = BattleShip::Ship::Piece.new(:$shape, :$coords);
+    my $piece = BattleShip::Ship::Piece.new(:$shape);
 
 
     @!pieces.push: $piece;
@@ -40,8 +40,3 @@ submethod BUILD ( Str :$name, ShipType :$type, BattleShip::Coords :@coords ) {
 
 }
 
-method coords () {
-
-  say @!pieces.map(*.coords);
-
-}
