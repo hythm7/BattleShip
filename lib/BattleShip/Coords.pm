@@ -1,17 +1,16 @@
 unit class BattleShip::Coords;
 
-has Int @.x is required;
 has Int @.y is required;
+has Int @.x is required;
 
 
-method Int () {
-  (@!x, @!y);
-}
+#method Int () {
+#  (@!y, @!x);
+#}
 
 method Str () {
-  (@!x, @!y);
+  (@!y, @!x);
 }
-
 
 #multi method move ( North ) {
 
