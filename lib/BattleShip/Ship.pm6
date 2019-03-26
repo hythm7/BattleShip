@@ -6,31 +6,42 @@ enum ShipType ( Destroyer => 2, Submarine => 3, Cruiser => 4, AircraftCarrier =>
 
 unit class BattleShip::Ship;
 
+has Str                     $.name;
 has ShipType                $.type;
-has State                   $.state;
+has BattleShip::Coords      @.coords;
+has State                   $!state;
 has BattleShip::Ship::Piece @.pieces;
-has BattleShip::Coords      $.coords;
 
 
-method new ( ShipType $type ) {
+#method new ( Str :$name, ShipType :$type, BattleShip::Coords :@coords ) {
 
-  self.bless(:$type);
+#  self.bless(:$name, :$type, :@coords);
 
-}
+#}
 
-submethod BUILD ( ShipType :$type ) {
+submethod BUILD ( Str :$name, ShipType :$type, BattleShip::Coords :@coords ) {
+
+  $!name = 'ship';
 
   $!type = $type;
-  
+
   my $shape = ShipPiece.pick;
-  @!pieces.push: BattleShip::Ship::Piece.new(:$shape) for ^$type;
+
+  for ^$type {
+    #@!pieces.push: BattleShip::Ship::Piece.new(:$shape, ) for ^$type;
+    my $coords = @coords.shift;
+    my $piece = BattleShip::Ship::Piece.new(:$shape, :$coords);
+
+
+    @!pieces.push: $piece;
   
+  }
   $!state = Swim;
 
 }
 
 method coords () {
 
-  @!pieces.map(*.coords);
+  say @!pieces.map(*.coords);
 
 }

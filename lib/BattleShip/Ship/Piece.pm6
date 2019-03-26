@@ -8,9 +8,6 @@ has Bool               $!hit   = False;
 has ShipPiece          $.shape = ShipPiece.roll;
 has BattleShip::Coords $.coords;
   
-method coords ( ) {
-  self.coords;
-}
 
 method Str () {
   $!shape.Str;
