@@ -7,4 +7,5 @@ use BattleShip::Ship;
 
 my $game = BattleShip.new;
 $game.draw;
-$game.hunt;
+$game.fire: :7y, :7x;
+#$game.hunt;

@@ -1,3 +1,4 @@
+use BattleShip::Player;
 use BattleShip::Ship;
 
 enum Fire        < Miss Hit >;
@@ -7,16 +8,18 @@ enum Orientation < Horizontal Vertical >;
 
 unit class BattleShip;
 
-has Int  $.x;
-has Int  $.y;
-has Int  $.count;
-has      @!plane;
-has Ship @!ships;
+has Int    $.x;
+has Int    $.y;
+has Int    $.count;
+has        @!plane;
+has Ship   @!ships;
+has Player $.player1;
+has Player $.player2;
 
 
-submethod BUILD ( Int :$!y = 10, Int :$!x = 10, Int :$!count = 4 ) {
+submethod BUILD ( Int :$!y = 10, Int :$!x = 10, Int :$!count = 10 ) {
 
-  @!plane = [ '.' xx $!y ] xx $!x;
+  @!plane = [ '~' xx $!y ] xx $!x;
 
   @!ships.append: Ship.new for ^$!count;
 
@@ -40,15 +43,19 @@ method hunt ( ShipType :$type = Submarine ) {
 
 method target ( :$y!, :$x!, ShipType :$type ) {
 
-  my $ship =  @!ships.first({ $y ∈ .coords.y and $x ∈ .coords.x });
   
-  say "($y $x) ({$ship.coords}) {$ship.pieces}"
+  say "($y $x) ({$type.coords}) {$type.pieces}"
 
 }
 
 method fire ( :$y!, :$x! --> Fire ) {
 
-  return Hit if @!plane[$y; $x] ~~ Ship::Piece;
+  if @!plane[$y; $x] ~~ Ship::Piece {
+
+    my $ship =  @!ships.first({ $y ∈ .coords.y and $x ∈ .coords.x });
+    say "You hit { $ship.type } { $ship.name } at ($y, $x)!";
+  }
+
   return Miss;
 
 }
@@ -94,7 +101,7 @@ submethod validate-coords ( Coords :$coords --> Bool:D ) {
 
   return False unless all($coords.y) ∈ ^$!y;
   return False unless all($coords.x) ∈ ^$!x;
-  return False unless all(@!plane[$coords.y; $coords.x]) ~~ '.';
+  return False unless all(@!plane[$coords.y; $coords.x]) ~~ '~';
 
   True;
 
