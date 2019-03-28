@@ -17,10 +17,9 @@ has Player $.player1;
 has Player $.player2;
 
 
-submethod BUILD ( Int :$!y = 10, Int :$!x = 10, Int :$!count = 5 ) {
+submethod BUILD ( Int :$!y = 20, Int :$!x = 20, Int :$!count = 20 ) {
 
   @!plane = [ '~' xx $!y ] xx $!x;
-
 
   self.place-ships;
 
@@ -32,9 +31,7 @@ method draw () {
   @!plane = [ '~' xx $!y ] xx $!x;
 
   for @!ships {
-    #  @!plane[.coords>>.y; .coords>>.x] = .pieces;
     @!plane[.coords.y][.coords.x] = .Str for .pieces;
-     #say @!plane[.y][.x];
   }
 
   .put for @!plane;
@@ -50,7 +47,7 @@ method hunt ( Type :$type = Submarine ) {
 
 method target ( :$y!, :$x!, Type :$type ) {
 
-  
+
   say "($y $x) ({$type.coords}) {$type.pieces}"
 
 }
@@ -86,48 +83,22 @@ submethod place-ships () {
 
 submethod rand-coords ( Type :$type, Orientation :$orientation = Orientation.roll ) {
 
-  my Int     @y;
-  my Int     @x;
   my Coords @coords;
 
+  my $y = (^$!y).roll;
+  my $x = (^$!x).roll;
+
   given $orientation {
-  
-    when Vertical {
-      my $y = (^$!y).roll;
-      my $x = (^$!x).roll;
 
-      @y.append: $y + $++  for ^$type;
-      @x.append: $x;
+    #TODO: Random ±
 
-      @coords.append: (@y X @x).map( -> [ $y, $x ] { Coords.new: :$y, :$x } );
-    }
-
-    when Horizontal {
-      my $y = (^$!y).roll;
-      my $x = (^$!x).roll;
-
-      @y.append: $y;
-      @x.append: $x + $++  for ^$type;
-
-      @coords.append: (@y X @x).map( -> [ $y, $x ] { Coords.new: :$y, :$x } );
-    }
-
-    when Diagonal {
-      my $y = (^$!y).roll;
-      my $x = (^$!x).roll;
-
-      @y.append: $y;
-      @x.append: $x + $++  for ^$type;
-
-      @coords.append: (@y X @x).map( -> [ $y, $x ] { Coords.new: :$y, :$x } );
-      @coords[0].y -= 1; 
-      @coords[*-1].y += 1; 
-    }
-  
+    do @coords.append: Coords.new: :y($y + $_), :$x         for ^$type when Vertical;
+    do @coords.append: Coords.new: :$y, :x($x + $_)         for ^$type when Horizontal;
+    do @coords.append: Coords.new: :y($y + $_), :x($x + $_) for ^$type when Diagonal;
   }
 
   return @coords if self.validate-coords: :@coords;
-  
+
   self.rand-coords: :$type, :$orientation;
 }
 
@@ -136,8 +107,6 @@ submethod validate-coords ( Coords :@coords --> Bool:D ) {
   return False unless all(@coords>>.y) ∈ ^$!y;
   return False unless all(@coords>>.x) ∈ ^$!x;
 
-  #return False unless all(@!plane[$coords.y; $coords.x]) ~~ '~';
-
-  True;
+  so none @coords Xeqv @!ships.map(*.coords).flat;
 
 }
