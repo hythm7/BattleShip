@@ -1,19 +1,19 @@
 NAME
 ====
 
-BattleShip - Game
+Battleship - Game
 
 SYNOPSIS
 ========
 
 ```perl6
-use BattleShip;
+use Battleship;
 ```
 
 DESCRIPTION
 ===========
 
-BattleShip is ...
+Battleship is ...
 
 AUTHOR
 ======

@@ -2,10 +2,10 @@
 #
 use lib <lib>;
 
-use BattleShip;
-use BattleShip::Ship;
+use Battleship;
+use Battleship::Ship;
 
-my $game = BattleShip.new;
+my $game = Battleship.new;
 $game.draw;
-$game.fire: :7y, :7x;
+#$game.fire: :7y, :7x;
 #$game.hunt;
