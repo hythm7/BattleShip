@@ -7,29 +7,23 @@ enum State < Swim Sink >;
 
 unit class Battleship::Ship;
 
-has Name  $.name is required;
+has Str   $.name is required;
 has Type  $.type is required;
 has Piece @.pieces;
 
-has Battleship::Coords @.coords is required;
-
 has State $!state;
 
-submethod BUILD ( Name :$!name, Type :$!type, Battleship::Coords :@!coords ) {
+submethod BUILD ( Str :$!name, Type :$!type ) {
 
   my $shape = ShipPiece.pick;
 
-  for @!coords -> $coords {
-
-    @!pieces.append: Piece.new( :$shape, :$coords );
-
-  }
+  @!pieces.append: Piece.new: :$shape for ^$!type;
 
   $!state = Swim;
 
 }
 
-#method coords () {
-#  @!pieces.map(*.coords);
-#}
+method coords () {
+  @!pieces.map(*.coords);
+}
 

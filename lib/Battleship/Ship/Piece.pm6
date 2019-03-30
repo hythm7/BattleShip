@@ -1,6 +1,6 @@
 use Battleship::Coords;
 
-enum ShipPiece < ■ ✗ ✘ ✓ ✔ ‡ ★ ⚜ ☆ □ ♜ ► ◄ △ ▽ ◉ ◎ ☢ ☯ ☣ >;
+enum ShipPiece < ■ ✘ ✔ ★ ⚜ ☆ □ ♜ ► ◄ △ ▽ ◉ ◎ ☢ ☯ ☣ >;
 
 unit class Battleship::Ship::Piece;
 

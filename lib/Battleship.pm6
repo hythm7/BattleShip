@@ -11,50 +11,53 @@ unit class Battleship;
 has Int    $.x;
 has Int    $.y;
 has Int    $.count;
-has        @!plane;
+has        @!board;
 has Ship   @!ships;
-has Player $.player1;
-has Player $.player2;
+has Player $.human;
 
 
-submethod BUILD ( Int :$!y = 20, Int :$!x = 20, Int :$!count = 20 ) {
+submethod BUILD ( Int :$!y = 20, Int :$!x = 20 ) {
 
-  @!plane = [ '~' xx $!y ] xx $!x;
+  # welcome
+  # init board
+  # print board
+  # init player
+  # place ships
+   
+  self.welcome;
+
+  @!board = self.init-board;
+
+  $!human = self.init-player;
+
+  @!ships = $!human.ship.values;
 
   self.place-ships;
+
+
+  self.draw;
+
+  #  self.place-ships;
 
 }
 
 
 method draw () {
 
-  @!plane = [ '~' xx $!y ] xx $!x;
+  for @!ships -> $ship {
 
-  for @!ships {
-    @!plane[.coords.y][.coords.x] = .Str for .pieces;
+    @!board[.coords.y][.coords.x] = .shape for $ship.pieces;
+
   }
 
-  .put for @!plane;
+  .put for @!board;
 
 }
 
-method hunt ( Type :$type = Submarine ) {
-
-  for self.filter-coords( :$type ) -> [ $y, $x ] {
-    self.target( :$y, :$x, :$type ) if self.fire( :$y, :$x ) ~~ Hit;
-  }
-}
-
-method target ( :$y!, :$x!, Type :$type ) {
-
-
-  say "($y $x) ({$type.coords}) {$type.pieces}"
-
-}
 
 method fire ( :$y!, :$x! --> Fire ) {
 
-  if @!plane[$y; $x] ~~ Ship::Piece {
+  if @!board[$y; $x] ~~ Ship::Piece {
 
     my $ship =  @!ships.first({ $y ∈ .coords.y and $x ∈ .coords.x });
     say "You hit { $ship.type } { $ship.name } at ($y, $x)!";
@@ -64,26 +67,23 @@ method fire ( :$y!, :$x! --> Fire ) {
 
 }
 
-method filter-coords ( Type :$type --> Seq ) {
-  (^$!y X ^$!x).grep( -> [ $y, $x ] { ($y + $x) %% $type } );
-}
 
 
 submethod place-ships () {
 
-  for ^$!count {
+  for @!ships -> $ship {
 
-    my $name = Name.roll;
-    my $type = Type.roll;
+    my @coords = self.rand-coords: type => $ship.type;
 
-    @!ships.append: Ship.new( :$name, :$type, :coords(self.rand-coords: :$type) );
+    .coords = @coords.shift for $ship.pieces;
+
   }
 
 }
 
 submethod rand-coords ( Type :$type, Orientation :$orientation = Orientation.roll ) {
 
-  my Coords @coords;
+  my Battleship::Coords @coords;
 
   my $y = (^$!y).roll;
   my $x = (^$!x).roll;
@@ -92,9 +92,9 @@ submethod rand-coords ( Type :$type, Orientation :$orientation = Orientation.rol
 
     #TODO: Random ±
 
-    do @coords.append: Coords.new: :y($y + $_), :$x         for ^$type when Vertical;
-    do @coords.append: Coords.new: :$y, :x($x + $_)         for ^$type when Horizontal;
-    do @coords.append: Coords.new: :y($y + $_), :x($x + $_) for ^$type when Diagonal;
+    do @coords.append: Coords.new: y => $y,      x => $x + $_ for ^$type when Horizontal;
+    do @coords.append: Coords.new: y => $y + $_, x => $x      for ^$type when Vertical;
+    do @coords.append: Coords.new: y => $y + $_, x => $x + $_ for ^$type when Diagonal;
   }
 
   return @coords if self.validate-coords: :@coords;
@@ -108,5 +108,39 @@ submethod validate-coords ( Coords :@coords --> Bool:D ) {
   return False unless all(@coords>>.x) ∈ ^$!x;
 
   so none @coords Xeqv @!ships.map(*.coords).flat;
+
+}
+
+method welcome ( ) {
+
+  say 'Welcome!';
+
+}
+
+method init-board ( ) {
+
+  [ '~' xx $!y ] xx $!x;
+
+}
+
+method init-player ( ) {
+
+  #my $name = prompt "Enter player name: ";
+  my $name = 'hythm';
+
+  my Ship %ship;
+
+  for Submarine, Submarine, Cruiser, Cruiser, Carrier -> $type {
+
+    my $name = $type.Str ~ $++;
+    #my $name = prompt "Enter $type name: ";
+
+    #$name = prompt "Name alredy used, Enter new name: " while %ship{$name};    
+
+    %ship{$name} = Ship.new: :$name, :$type;
+
+  }
+
+  $!human = Player.new: :$name, :%ship;
 
 }
