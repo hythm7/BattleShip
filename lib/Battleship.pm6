@@ -2,7 +2,6 @@ use Battleship::Player;
 use Battleship::Ship;
 
 enum Fire        < Miss Hit >;
-enum Direction   < North East South West >;
 enum Orientation < Horizontal Vertical Diagonal >;
 
 
@@ -26,23 +25,28 @@ submethod BUILD ( Int :$!y = 20, Int :$!x = 20 ) {
    
   self.welcome;
 
-  @!board = self.init-board;
-
   $!human = self.init-player;
 
   @!ships = $!human.ship.values;
 
   self.place-ships;
 
-
   self.draw;
 
-  #  self.place-ships;
+  loop {
+
+    my $cmd = self.read-command;
+
+    self.update: :$cmd;
+    self.draw;
+  }
 
 }
 
 
 method draw () {
+
+  @!board = self.clear-board;
 
   for @!ships -> $ship {
 
@@ -50,10 +54,33 @@ method draw () {
 
   }
 
+  qx<clear>;
+
   .put for @!board;
 
 }
 
+submethod read-command {
+
+  #my $cmd = prompt "> "; 
+  my $cmd = 'move';
+
+  sleep 1;
+  $cmd;
+
+}
+
+submethod update ( :$cmd ) {
+
+
+  given $cmd {
+
+    @!ships[0].move: Right when 'move';
+
+
+  }
+  
+}
 
 method fire ( :$y!, :$x! --> Fire ) {
 
@@ -117,9 +144,9 @@ method welcome ( ) {
 
 }
 
-method init-board ( ) {
+method clear-board ( ) {
 
-  [ '~' xx $!y ] xx $!x;
+  @!board = [ '~' xx $!y ] xx $!x;
 
 }
 

@@ -2,6 +2,7 @@ use Battleship::Coords;
 use Battleship::Ship::Piece;
 
 enum Name < Turtle Alligator Whale Bass Bonita Shark Seal Salmon Seawolf Tarpon Cuttlefish >;
+enum Direction < Forwad Left Backward Right >;
 enum Type ( Submarine => 3, Cruiser => 5, Carrier => 7);
 enum State < Swim Sink >;
 
@@ -20,6 +21,12 @@ submethod BUILD ( Str :$!name, Type :$!type ) {
   @!pieces.append: Piece.new: :$shape for ^$!type;
 
   $!state = Swim;
+
+}
+
+multi method move ( Right ) {
+
+  @!pieces.map( -> $p { $p.coords = $p.coords.east });
 
 }
 

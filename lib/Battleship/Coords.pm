@@ -8,7 +8,11 @@ has Int $.x is required is rw;
 #  (@!y, @!x);
 #}
 
-method Str () {
+method east ( ) {
+  self.new: :$!y, x => $!x + 1;
+}
+
+method Str ( ) {
   ($!y, $!x);
 }
 
