@@ -7,4 +7,4 @@ has Int $!shots;
 has Int $!hits;
 has Int $!misses;
 
-has Battleship::Ship %.ship;
+has Battleship::Ship @.ship;

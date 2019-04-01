@@ -3,7 +3,7 @@
 use lib <lib>;
 use Battleship::Command;
 
-my $command = 'f 42, 7';
+my $command = 'move submarine right';
 my $actions = Battleship::CommandActions;
 my $m =  Battleship::Command.parse: $command, :$actions;
 

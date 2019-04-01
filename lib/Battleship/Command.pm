@@ -43,33 +43,33 @@ grammar Battleship::Command {
 class Battleship::CommandActions {
 
 
-  method TOP:sym<fire> ( $/ ) { 
+  method TOP:sym<fire> ( $/ ) {
 
     my %h;
 
-    %h<cmd>    = $<fire>.ast; 
-    %h<coords> = $<coords>.ast; 
+    %h<cmd>    = $<fire>.ast;
+    %h<coords> = $<coords>.ast;
 
     make %h;
   }
 
-  method TOP:sym<move> ( $/ ) { 
+  method TOP:sym<move> ( $/ ) {
 
     my %h;
 
-    %h<cmd>       = $<move>.ast; 
-    %h<direction> = $<direction>.ast; 
-    %h<ship>      = $<ship>.ast; 
+    %h<cmd>       = $<move>.ast;
+    %h<direction> = $<direction>.ast;
+    %h<ship>      = $<ship>.ast;
 
     make %h;
   }
 
-  method TOP:sym<sink> ( $/ ) { 
+  method TOP:sym<sink> ( $/ ) {
 
     my %h;
 
-    %h<cmd>  = $<sink>.ast; 
-    %h<ship> = $<ship>.ast; 
+    %h<cmd>  = $<sink>.ast;
+    %h<ship> = $<ship>.ast;
 
     make %h;
   }

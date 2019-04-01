@@ -22,31 +22,31 @@ submethod BUILD ( Int :$!y = 20, Int :$!x = 20 ) {
   # print board
   # init player
   # place ships
-   
+
   self.welcome;
 
   $!human = self.init-player;
 
-  @!ships = $!human.ship.values;
+  @!ships = $!human.ship;
 
   self.place-ships;
 
-  self.draw;
+  #self.draw;
 
-  loop {
+  #loop {
 
-    my $cmd = self.read-command;
+  #  my $cmd = self.read-command;
 
-    self.update: :$cmd;
-    self.draw;
-  }
+  #  self.update: :$cmd;
+  #  self.draw;
+  #}
 
 }
 
 
 method draw () {
 
-  @!board = self.clear-board;
+  self.clear-board;
 
   for @!ships -> $ship {
 
@@ -54,40 +54,24 @@ method draw () {
 
   }
 
-  qx<clear>;
+  #clear;
 
   .put for @!board;
 
 }
 
-submethod read-command {
-
-  #my $cmd = prompt "> "; 
-  my $cmd = 'move';
-
-  sleep 1;
-  $cmd;
-
-}
 
 submethod update ( :$cmd ) {
 
 
-  given $cmd {
-
-    @!ships[0].move: Right when 'move';
-
-
-  }
-  
 }
 
-method fire ( :$y!, :$x! --> Fire ) {
+method check-shot ( Coords :$coords --> Fire ) {
 
-  if @!board[$y; $x] ~~ Ship::Piece {
+  if @!board[$coords.y][$coords.x] ~~ Ship::Piece {
 
-    my $ship =  @!ships.first({ $y ∈ .coords.y and $x ∈ .coords.x });
-    say "You hit { $ship.type } { $ship.name } at ($y, $x)!";
+    my $ship =  @!ships.first({ .coords eqv $coords });
+    say "You hit { $ship.type } { $ship.name } at ($coords.y, $coords.x)!";
   }
 
   return Miss;
@@ -108,7 +92,7 @@ submethod place-ships () {
 
 }
 
-submethod rand-coords ( Type :$type, Orientation :$orientation = Orientation.roll ) {
+submethod rand-coords ( Type :$type, Orientation :$orientation = Horizontal ) {
 
   my Battleship::Coords @coords;
 
@@ -155,19 +139,21 @@ method init-player ( ) {
   #my $name = prompt "Enter player name: ";
   my $name = 'hythm';
 
-  my Ship %ship;
+  my Ship @ship;
 
   for Submarine, Submarine, Cruiser, Cruiser, Carrier -> $type {
 
     my $name = $type.Str ~ $++;
     #my $name = prompt "Enter $type name: ";
 
-    #$name = prompt "Name alredy used, Enter new name: " while %ship{$name};    
+    #$name = prompt "Name alredy used, Enter new name: " while %ship{$name};
 
-    %ship{$name} = Ship.new: :$name, :$type;
+    @ship.append: Ship.new: :$name, :$type;
 
   }
 
-  $!human = Player.new: :$name, :%ship;
+  $!human = Player.new: :$name, :@ship;
 
 }
+
+sub clear { print qx[clear] }
