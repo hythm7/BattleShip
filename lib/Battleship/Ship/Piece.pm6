@@ -1,13 +1,14 @@
 use Battleship::Coords;
 
-enum ShipPiece < ■ ✘ ✔ ★ ⚜ ☆ □ ♜ ► ◄ △ ▽ ◉ ◎ ☢ ☯ ☣ >;
+#enum ShipPiece < ■ ✘ ✔ ★ ⚜ ☆ □ ♜ ► ◄ △ ▽ ◉ ◎ ☢ ☯ ☣ >;
 
 unit class Battleship::Ship::Piece;
 
-has ShipPiece          $.shape = ShipPiece.roll;
-has Battleship::Coords $.coords is rw;
-has Bool               $!hit   = False;
+has Str  $.shape is rw  = '■';
+has      $.color is rw;
+has Bool $!hit          = False;
 
+has Battleship::Coords $.coords is rw;
 
 method Str ( ) {
   $!shape.Str;

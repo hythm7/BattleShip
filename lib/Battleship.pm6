@@ -1,9 +1,11 @@
+use Terminal::ANSIColor;
 use Battleship::Player;
 use Battleship::Ship;
 
 enum Fire        < Miss Hit >;
 enum Orientation < Horizontal Vertical Diagonal >;
 
+constant WATER = colored('~', 'cyan');
 
 unit class Battleship;
 
@@ -130,7 +132,7 @@ method welcome ( ) {
 
 method clear-board ( ) {
 
-  @!board = [ '~' xx $!y ] xx $!x;
+  @!board = [ WATER xx $!y ] xx $!x;
 
 }
 

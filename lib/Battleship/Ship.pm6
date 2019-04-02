@@ -1,9 +1,11 @@
+use Terminal::ANSIColor;
 use Battleship::Coords;
 use Battleship::Ship::Piece;
 
 enum Name < Turtle Alligator Whale Bass Bonita Shark Seal Salmon Seawolf Tarpon Cuttlefish >;
 enum Direction < north south east west northeast northwest southeast southwest forward backward left right>;
 enum Type ( Submarine => 3, Cruiser => 5, Carrier => 7);
+enum Color < black red green yellow blue magenta cyan >;
 enum State < Swim Sink >;
 
 # TODO: head shot eq sink
@@ -20,7 +22,7 @@ has State $!state;
 
 submethod BUILD ( Str :$!name, Type :$!type ) {
 
-  my $shape = ShipPiece.pick;
+  my $shape = colored('■', Color.roll.Str);
 
   @!pieces.append: Piece.new: :$shape for ^$!type;
 
