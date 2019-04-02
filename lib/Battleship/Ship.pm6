@@ -58,7 +58,7 @@ multi method move ( $ where ~backward ) {
 
 }
 
-multi method move ( $ where ~left ) {
+multi method move ( $ where ~right ) {
 
   my $rc = $!type div 2; # rotation center
 
@@ -66,26 +66,64 @@ multi method move ( $ where ~left ) {
 
     when west {
 
-      for 1 .. $rc -> $i {
-        .coords = .coords.north($i) for @!pieces.head($rc);
-        .coords = .coords.south($i) for @!pieces.tail($rc);
-      }
+      .coords = .coords.south(++$) for @!pieces.tail($rc);
+      .coords = .coords.north(++$) for @!pieces.head($rc).reverse;
+
     }
 
     when east {
-      for 1 .. $rc -> $i {
-        @!pieces.head($rc).map( -> $p { $p.coords = $p.coords.northwest($i) });
-        @!pieces.tail($rc).map( -> $p { $p.coords = $p.coords.southeast($i) });
-      }
+
+      .coords = .coords.north(++$) for @!pieces.tail($rc);
+      .coords = .coords.south(++$) for @!pieces.head($rc).reverse;
+
     }
 
+    when north {
+
+      .coords = .coords.west(++$) for @!pieces.tail($rc).reverse;
+      .coords = .coords.east(++$) for @!pieces.head($rc);
+
+    }
+
+    when south {
+
+      .coords = .coords.east(++$) for @!pieces.tail($rc);
+      .coords = .coords.west(++$) for @!pieces.head($rc).reverse;
+
+    }
+
+    when northeast {
+
+      .coords = .coords.south(++$) for @!pieces.head($rc);
+      .coords = .coords.north(++$) for @!pieces.tail($rc).reverse;
+
+    }
+
+    when northwest {
+
+      .coords = .coords.east(++$) for @!pieces.head($rc);
+      .coords = .coords.west(++$) for @!pieces.tail($rc).reverse;
+
+    }
+
+    when southeast {
+
+      .coords = .coords.west(++$) for @!pieces.head($rc);
+      .coords = .coords.east(++$) for @!pieces.tail($rc).reverse;
+
+    }
+
+    when southwest {
+
+      .coords = .coords.north(++$) for @!pieces.tail($rc);
+      .coords = .coords.south(++$) for @!pieces.head($rc).reverse;
+
+    }
+
+
+
   }
-}
-
-multi method move ( $ where ~right ) {
-
-  #@!pieces.map( -> $p { $p.coords = $p.coords.west });
-
+  say self.direction;
 }
 
 method direction ( --> Direction ) {
@@ -105,17 +143,17 @@ method direction ( --> Direction ) {
 
     when $head.x == $tail.x {
 
-      return north if  $head.y > $tail.y;
-      return south if  $head.y < $tail.y;
+      return north if  $head.y < $tail.y;
+      return south if  $head.y > $tail.y;
 
     }
 
     default {
 
-      return southeast if  $head.y > $tail.y and $head.x > $tail.x;
-      return southwest if  $head.y > $tail.y and $head.x > $tail.x;
       return northeast if  $head.y < $tail.y and $head.x > $tail.x;
       return northwest if  $head.y < $tail.y and $head.x < $tail.x;
+      return southeast if  $head.y > $tail.y and $head.x > $tail.x;
+      return southwest if  $head.y < $tail.y and $head.x > $tail.x;
 
     }
 

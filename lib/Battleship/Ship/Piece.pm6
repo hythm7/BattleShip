@@ -9,6 +9,6 @@ has Battleship::Coords $.coords is rw;
 has Bool               $!hit   = False;
   
 
-method Str () {
+method Str ( ) {
   $!shape.Str;
 }

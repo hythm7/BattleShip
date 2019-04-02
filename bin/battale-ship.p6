@@ -15,7 +15,7 @@ my $human = $game.human;
 
 
 $game.draw;
-say .name, .direction for $human.ship;
+
 loop {
 
 

@@ -10,12 +10,10 @@ has Int $.x is required is rw;
 #}
 
 method north ( Int $i = 1 ) {
-say 'north';
   self.new: y => $!y - $i, x => $!x;
 }
 
 method south ( Int $i = 1 ) {
-say 'south';
   self.new: y => $!y + $i, x => $!x;
 }
 
@@ -32,12 +30,10 @@ method northeast ( Int $i = $i ) {
 }
 
 method northwest ( Int $i = 1 ) {
-say 'northwest';
   self.new: y => $!y - $i, x => $!x - $i;
 }
 
 method southeast ( Int $i = 1 ) {
-say 'southeast';
   self.new: y => $!y + $i, x => $!x + $i;
 }
 
