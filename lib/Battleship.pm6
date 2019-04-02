@@ -54,7 +54,7 @@ method draw () {
 
   }
 
-  #clear;
+  clear;
 
   .put for @!board;
 
@@ -92,7 +92,7 @@ submethod place-ships () {
 
 }
 
-submethod rand-coords ( Type :$type, Orientation :$orientation = Horizontal ) {
+submethod rand-coords ( Type :$type, Orientation :$orientation = Orientation.roll ) {
 
   my Battleship::Coords @coords;
 
@@ -143,7 +143,8 @@ method init-player ( ) {
 
   for Submarine, Submarine, Cruiser, Cruiser, Carrier -> $type {
 
-    my $name = $type.Str ~ $++;
+    my @names = < s1 s2 c1 c2 c >;
+    my $name = @names[$++];
     #my $name = prompt "Enter $type name: ";
 
     #$name = prompt "Name alredy used, Enter new name: " while %ship{$name};

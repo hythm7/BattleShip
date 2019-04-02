@@ -25,7 +25,7 @@ method west ( Int $i = 1 ) {
   self.new: y => $!y, x => $!x - $i;
 }
 
-method northeast ( Int $i = $i ) {
+method northeast ( Int $i = 1 ) {
   self.new: y => $!y - $i, x => $!x + $i;
 }
 

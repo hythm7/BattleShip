@@ -58,69 +58,132 @@ multi method move ( $ where ~backward ) {
 
 }
 
+multi method move ( $ where ~left ) {
+
+  my $rc = $!type div 2; # rotation center
+
+  given self.direction {
+
+    when north {
+
+      .coords = .coords.west(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.east(++$) for @!pieces.tail($rc);
+
+    }
+
+    when south {
+
+      .coords = .coords.east(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.west(++$) for @!pieces.tail($rc);
+
+    }
+
+    when east {
+
+      .coords = .coords.north(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.south(++$) for @!pieces.tail($rc);
+
+    }
+
+    when west {
+
+      .coords = .coords.south(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.north(++$) for @!pieces.tail($rc);
+    }
+
+    when northeast {
+
+      .coords = .coords.west(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.east(++$) for @!pieces.tail($rc);
+
+    }
+
+    when northwest {
+
+      .coords = .coords.south(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.north(++$) for @!pieces.tail($rc);
+
+    }
+
+    when southeast {
+
+      .coords = .coords.north(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.south(++$) for @!pieces.tail($rc);
+
+    }
+
+    when southwest {
+
+      .coords = .coords.east(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.west(++$) for @!pieces.tail($rc);
+
+    }
+
+  }
+
+}
+
+
 multi method move ( $ where ~right ) {
 
   my $rc = $!type div 2; # rotation center
 
   given self.direction {
 
-    when west {
-
-      .coords = .coords.south(++$) for @!pieces.tail($rc);
-      .coords = .coords.north(++$) for @!pieces.head($rc).reverse;
-
-    }
-
-    when east {
-
-      .coords = .coords.north(++$) for @!pieces.tail($rc);
-      .coords = .coords.south(++$) for @!pieces.head($rc).reverse;
-
-    }
-
     when north {
 
-      .coords = .coords.west(++$) for @!pieces.tail($rc).reverse;
-      .coords = .coords.east(++$) for @!pieces.head($rc);
+      .coords = .coords.east(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.west(++$) for @!pieces.tail($rc);
 
     }
 
     when south {
 
-      .coords = .coords.east(++$) for @!pieces.tail($rc);
       .coords = .coords.west(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.east(++$) for @!pieces.tail($rc);
 
+    }
+
+    when east {
+
+      .coords = .coords.south(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.north(++$) for @!pieces.tail($rc);
+
+    }
+
+    when west {
+
+      .coords = .coords.north(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.south(++$) for @!pieces.tail($rc);
     }
 
     when northeast {
 
-      .coords = .coords.south(++$) for @!pieces.head($rc);
-      .coords = .coords.north(++$) for @!pieces.tail($rc).reverse;
+      .coords = .coords.south(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.north(++$) for @!pieces.tail($rc);
 
     }
 
     when northwest {
 
-      .coords = .coords.east(++$) for @!pieces.head($rc);
-      .coords = .coords.west(++$) for @!pieces.tail($rc).reverse;
+      .coords = .coords.east(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.west(++$) for @!pieces.tail($rc);
 
     }
 
     when southeast {
 
-      .coords = .coords.west(++$) for @!pieces.head($rc);
-      .coords = .coords.east(++$) for @!pieces.tail($rc).reverse;
+      .coords = .coords.west(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.east(++$) for @!pieces.tail($rc);
 
     }
 
     when southwest {
 
-      .coords = .coords.north(++$) for @!pieces.tail($rc);
-      .coords = .coords.south(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.north(++$) for @!pieces.head($rc).reverse;
+      .coords = .coords.south(++$) for @!pieces.tail($rc);
 
     }
-
-
 
   }
   say self.direction;
@@ -153,7 +216,7 @@ method direction ( --> Direction ) {
       return northeast if  $head.y < $tail.y and $head.x > $tail.x;
       return northwest if  $head.y < $tail.y and $head.x < $tail.x;
       return southeast if  $head.y > $tail.y and $head.x > $tail.x;
-      return southwest if  $head.y < $tail.y and $head.x > $tail.x;
+      return southwest if  $head.y > $tail.y and $head.x < $tail.x;
 
     }
 

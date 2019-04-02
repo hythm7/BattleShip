@@ -37,8 +37,6 @@ loop {
       my $ship = $human.ship.first({ .name eq $name });
       $ship.move: $direction if $ship;
 
-      sleep 1;
-
     }
 
     when 'fire' {
