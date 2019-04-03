@@ -1,19 +1,40 @@
-unit role Battleship::AI;
+use Battleship::Player;
+use Battleship::Ship;
 
-#method hunt ( Type :$type = Submarine ) {
+unit class Battleship::AI;
+  also is Battleship::Player;
 
-    #  for self.filter-coords( :$type ) -> [ $y, $x ] {
-        #    self.target( :$y, :$x, :$type ) if self.fire( :$y, :$x ) ~~ Hit;
-        #  }
-  #}
+enum Name < Ghost Salmon Deepblue Warrior Majesty >;
 
-#method target ( :$y!, :$x!, Type :$type ) {
+has Int $.board-y = 20;
+has Int $.board-x = 20;
 
-    #say "($y $x) ({$type.coords}) {$type.pieces}"
+has Str $.name = 'AI';
+has Battleship::Ship @.ship;
 
-  #}
+submethod BUILD ( ) {
 
-#method filter-coords ( Type :$type --> Seq ) {
-    #  (^$!y X ^$!x).grep( -> [ $y, $x ] { ($y + $x) %% $type } );
-          #}
+  for Submarine, Submarine, Cruiser, Cruiser, Carrier -> $type {
+    @!ship.append: Battleship::Ship.new: name => Name.pick.Str, :$type;
+  }
+
+}
+
+method hunt ( Type :$type = Submarine ) {
+
+  for self.filter-coords( :$type ) -> [ $y, $x ] {
+    self.target( :$y, :$x, :$type );
+  }
+}
+
+method target ( :$y!, :$x!, Type :$type ) {
+
+
+  say "($y $x) ({$type.coords}) {$type.pieces}"
+
+}
+
+method filter-coords ( Type :$type --> Seq ) {
+  (^$!board-y X ^$!board-x).grep( -> [ $y, $x ] { ($y + $x) %% $type } );
+}
 

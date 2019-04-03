@@ -3,60 +3,94 @@
 use lib <lib>;
 
 use Battleship;
+use Battleship::Ship;
+use Battleship::Player;
+use Battleship::AI;
 use Battleship::Command;
 
-my %conf;
+
+welcome;
 
 
+my $human = init-player;
+my $ai    = Battleship::AI.new;
 
-my $game = Battleship.new;
+my @player = $human, $ai;
 
-my $human = $game.human;
+my $game = Battleship.new: :@player;
 
 
-$game.draw;
+my $i = 2;
 
 loop {
 
+  my $player = @player[$i++ mod 2];
 
-  $game.draw;
-  my $command = prompt "> ";;
-  #my $command = 'move Submarine0 west';
-  #say $command;
 
-  my $m = Battleship::Command.parse( $command, :actions(Battleship::CommandActions) );
-  my %command = $m.ast if $m;
+      $game.draw: :$player;
+      my $command = prompt "> ";;
+      #my $command = 'move Submarine0 west';
+      #say $command;
 
-  given %command<cmd> {
+      my $m = Battleship::Command.parse( $command, :actions(Battleship::CommandActions) );
+      my %command = $m.ast if $m;
 
-    when 'move' {
+      given %command<cmd> {
 
-      my $name      = %command<ship>;
-      my $direction = %command<direction>;
+        when 'move' {
 
-      my $ship = $human.ship.first({ .name eq $name });
-      $ship.move: $direction if $ship;
+          my $name      = %command<ship>;
+          my $direction = %command<direction>;
 
-    }
+          my $ship = $human.ship.first({ .name eq $name });
+          $ship.move: $direction if $ship;
 
-    when 'fire' {
+        }
 
-      my $coords = %command<coords>;
+        when 'fire' {
 
-      $game.check-shot: :$coords;
+          my $coords = %command<coords>;
 
-    }
+          $game.check-shot: :$coords;
 
-    default {
+        }
 
-      say 'Sorry I did not understand that, try again';
+        default {
 
-    }
+          say 'Sorry I did not understand that, try again';
 
+        }
+
+
+
+    }  #$game.update: :$cmd;
+
+}
+
+sub init-player ( ) {
+
+  #my $name = prompt "Enter player name: ";
+  my $name = 'hythm';
+
+  my Battleship::Ship @ship;
+
+  for Submarine, Submarine, Cruiser, Cruiser, Carrier -> $type {
+
+    my @names = < s1 s2 c1 c2 c >;
+    my $name = @names[$++];
+    #my $name = prompt "Enter $type name: ";
+
+    #$name = prompt "Name alredy used, Enter new name: " while %ship{$name};
+
+    @ship.append: Battleship::Ship.new: :$name, :$type;
 
   }
 
-  #$game.update: :$cmd;
+  Battleship::Player.new: :$name, :@ship;
 
+}
 
+sub welcome ( ) {
+
+  say 'Welcome!';
 }

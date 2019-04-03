@@ -2,7 +2,7 @@ use Battleship::Ship;
 
 unit class Battleship::Player;
 
-has Str $.name;
+has Str $.name ;
 has Int $!shots;
 has Int $!hits;
 has Int $!misses;

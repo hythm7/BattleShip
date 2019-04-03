@@ -13,11 +13,11 @@ has Int    $.x;
 has Int    $.y;
 has Int    $.count;
 has        @!board;
-has Ship   @!ships;
-has Player $.human;
+has Ship   @.ships;
+has Player @.player[2];
 
 
-submethod BUILD ( Int :$!y = 20, Int :$!x = 20 ) {
+submethod BUILD ( Int :$!y = 20, Int :$!x = 20, :@!player ) {
 
   # welcome
   # init board
@@ -25,11 +25,9 @@ submethod BUILD ( Int :$!y = 20, Int :$!x = 20 ) {
   # init player
   # place ships
 
-  self.welcome;
+  #$!human = self.init-player;
 
-  $!human = self.init-player;
-
-  @!ships = $!human.ship;
+  @!ships = @!player.map(*.ship).flat;
 
   self.place-ships;
 
@@ -46,19 +44,19 @@ submethod BUILD ( Int :$!y = 20, Int :$!x = 20 ) {
 }
 
 
-method draw () {
+method draw ( :$player ) {
 
   self.clear-board;
 
-  for @!ships -> $ship {
+  for $player.ship -> $ship {
 
     @!board[.coords.y][.coords.x] = .shape for $ship.pieces;
 
   }
+  
+  #clear;
 
-  clear;
-
-  .put for @!board;
+  .join.put for @!board;
 
 }
 
@@ -70,19 +68,21 @@ submethod update ( :$cmd ) {
 
 method check-shot ( Coords :$coords --> Fire ) {
 
-  if @!board[$coords.y][$coords.x] ~~ Ship::Piece {
+  say @!board[$coords.y][$coords.x];
+  if colorstrip @!board[$coords.y][$coords.x] eq '■' {
 
     my $ship =  @!ships.first({ .coords eqv $coords });
     say "You hit { $ship.type } { $ship.name } at ($coords.y, $coords.x)!";
   }
 
+  say Miss;
   return Miss;
 
 }
 
 
 
-submethod place-ships () {
+submethod place-ships ( ) {
 
   for @!ships -> $ship {
 
@@ -133,29 +133,6 @@ method welcome ( ) {
 method clear-board ( ) {
 
   @!board = [ WATER xx $!y ] xx $!x;
-
-}
-
-method init-player ( ) {
-
-  #my $name = prompt "Enter player name: ";
-  my $name = 'hythm';
-
-  my Ship @ship;
-
-  for Submarine, Submarine, Cruiser, Cruiser, Carrier -> $type {
-
-    my @names = < s1 s2 c1 c2 c >;
-    my $name = @names[$++];
-    #my $name = prompt "Enter $type name: ";
-
-    #$name = prompt "Name alredy used, Enter new name: " while %ship{$name};
-
-    @ship.append: Ship.new: :$name, :$type;
-
-  }
-
-  $!human = Player.new: :$name, :@ship;
 
 }
 
