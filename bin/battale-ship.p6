@@ -25,6 +25,7 @@ my $i = 2;
 loop {
 
   my $player = @player[$i++ mod 2];
+#  my $player = @player[0];
 
 
       $game.draw: :$player;
@@ -42,7 +43,7 @@ loop {
           my $name      = %command<ship>;
           my $direction = %command<direction>;
 
-          my $ship = $human.ship.first({ .name eq $name });
+          my $ship = $player.ship.first({ .name eq $name });
           $ship.move: $direction if $ship;
 
         }
@@ -51,7 +52,18 @@ loop {
 
           my $coords = %command<coords>;
 
-          $game.check-shot: :$coords;
+          my $result = $game.check-shot: :$coords;
+
+          if $result ~~ Hit {
+
+            my $ship = $game.ships.first({ so any(.coords) eqv $coords });
+            say $ship.pieces.first({ .coords eqv $coords }).hit ;
+
+          }
+
+          else {
+            say 'you missed!';
+          }
 
         }
 

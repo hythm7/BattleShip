@@ -13,3 +13,4 @@ has Battleship::Coords $.coords is rw;
 method Str ( ) {
   $!shape.Str;
 }
+

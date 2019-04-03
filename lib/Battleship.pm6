@@ -53,10 +53,10 @@ method draw ( :$player ) {
     @!board[.coords.y][.coords.x] = .shape for $ship.pieces;
 
   }
-  
+
   #clear;
 
-  .join.put for @!board;
+  .put for @!board;
 
 }
 
@@ -68,14 +68,9 @@ submethod update ( :$cmd ) {
 
 method check-shot ( Coords :$coords --> Fire ) {
 
-  say @!board[$coords.y][$coords.x];
-  if colorstrip @!board[$coords.y][$coords.x] eq '■' {
+  my $sym = colorstrip @!board[$coords.y][$coords.x];
 
-    my $ship =  @!ships.first({ .coords eqv $coords });
-    say "You hit { $ship.type } { $ship.name } at ($coords.y, $coords.x)!";
-  }
-
-  say Miss;
+  return Hit if  $sym eq '■';
   return Miss;
 
 }
