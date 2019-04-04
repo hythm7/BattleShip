@@ -13,11 +13,11 @@ has Int    $.x;
 has Int    $.y;
 has Int    $.count;
 has        @!board;
-has Ship   @.ships;
+has Ship   @.ship;
 has Player @.player[2];
 
 
-submethod BUILD ( Int :$!y = 20, Int :$!x = 20, :@!player ) {
+submethod BUILD ( Int :$!y = 20, Int :$!x = 20, :@!player, :@!ship ) {
 
   # welcome
   # init board
@@ -26,8 +26,6 @@ submethod BUILD ( Int :$!y = 20, Int :$!x = 20, :@!player ) {
   # place ships
 
   #$!human = self.init-player;
-
-  @!ships = @!player.map(*.ship).flat;
 
   self.place-ships;
 
@@ -48,9 +46,9 @@ method draw ( :$player ) {
 
   self.clear-board;
 
-  for $player.ship -> $ship {
+  for @!ship -> $ship {
 
-    @!board[.coords.y][.coords.x] = .shape for $ship.pieces;
+    @!board[.coords.y][.coords.x] = colored(.shape, .color) for $ship.pieces;
 
   }
 
@@ -79,7 +77,7 @@ method check-shot ( Coords :$coords --> Fire ) {
 
 submethod place-ships ( ) {
 
-  for @!ships -> $ship {
+  for @!ship -> $ship {
 
     my @coords = self.rand-coords: type => $ship.type;
 
@@ -115,7 +113,7 @@ submethod validate-coords ( Coords :@coords --> Bool:D ) {
   return False unless all(@coords>>.y) ∈ ^$!y;
   return False unless all(@coords>>.x) ∈ ^$!x;
 
-  so none @coords Xeqv @!ships.map(*.coords).flat;
+  so none @coords Xeqv @!ship.map(*.coords).flat;
 
 }
 

@@ -5,8 +5,8 @@ use Battleship::Coords;
 unit class Battleship::Ship::Piece;
 
 has Str  $.shape is rw  = '■';
-has      $.color is rw;
-has Bool $!hit          = False;
+has Str  $.color is rw;
+has Bool $.hit   is rw  = False;
 
 has Battleship::Coords $.coords is rw;
 

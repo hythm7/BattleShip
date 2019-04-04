@@ -14,13 +14,13 @@ has Battleship::Ship @.ship;
 
 submethod BUILD ( ) {
 
-  for Submarine, Submarine, Cruiser, Cruiser, Carrier -> $type {
-    @!ship.append: Battleship::Ship.new: name => Name.pick.Str, :$type;
+  for Frigate, Corvette, Destroyer, Cruiser, Carrier -> $type {
+    @!ship.append: Battleship::Ship.new: owner => $!name, name => Name.pick.Str, :$type;
   }
 
 }
 
-method hunt ( Type :$type = Submarine ) {
+method hunt ( Type :$type = Destroyer ) {
 
   for self.filter-coords( :$type ) -> [ $y, $x ] {
     self.target( :$y, :$x, :$type );

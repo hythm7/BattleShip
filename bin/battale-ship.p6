@@ -11,94 +11,103 @@ use Battleship::Command;
 
 welcome;
 
+my @ship;
 
-my $human = init-player;
-my $ai    = Battleship::AI.new;
+my $human = Battleship::Player.new: name => 'hythm';
+my $ai    = Battleship::AI.new:     name => 'ai';
 
 my @player = $human, $ai;
 
-my $game = Battleship.new: :@player;
+for @player -> $player {
 
-
-my $i = 2;
-
-loop {
-
-  my $player = @player[$i++ mod 2];
-#  my $player = @player[0];
-
-
-      $game.draw: :$player;
-      my $command = prompt "> ";;
-      #my $command = 'move Submarine0 west';
-      #say $command;
-
-      my $m = Battleship::Command.parse( $command, :actions(Battleship::CommandActions) );
-      my %command = $m.ast if $m;
-
-      given %command<cmd> {
-
-        when 'move' {
-
-          my $name      = %command<ship>;
-          my $direction = %command<direction>;
-
-          my $ship = $player.ship.first({ .name eq $name });
-          $ship.move: $direction if $ship;
-
-        }
-
-        when 'fire' {
-
-          my $coords = %command<coords>;
-
-          my $result = $game.check-shot: :$coords;
-
-          if $result ~~ Hit {
-
-            my $ship = $game.ships.first({ so any(.coords) eqv $coords });
-            say $ship.pieces.first({ .coords eqv $coords }).hit ;
-
-          }
-
-          else {
-            say 'you missed!';
-          }
-
-        }
-
-        default {
-
-          say 'Sorry I did not understand that, try again';
-
-        }
-
-
-
-    }  #$game.update: :$cmd;
+  @ship.append: init-ship( owner => $player.name )
 
 }
 
-sub init-player ( ) {
+my $game = Battleship.new: :@player, :@ship;
 
-  #my $name = prompt "Enter player name: ";
-  my $name = 'hythm';
+
+#my $i = 2;
+
+loop {
+
+#  my $player = @player[$i++ mod 2];
+  my $player = @player[0];
+
+  $game.draw: :$player;
+
+  print 'Now what! > ';
+
+  my $command = $player.command;
+  #my $command = 'move Submarine0 west';
+
+  my $m = Battleship::Command.parse( $command, :actions(Battleship::CommandActions) );
+  my %command = $m.ast if $m;
+
+  given %command<cmd> {
+
+    when 'move' {
+
+      my $name      = %command<ship>;
+      my $direction = %command<direction>;
+
+      my $ship = $game.ship.grep( *.owner eq $player.name ).first( *.name eq $name );
+      $ship.move: $direction if $ship;
+
+    }
+
+    when 'fire' {
+
+      my $coords = %command<coords>;
+
+      my $result = $game.check-shot: :$coords;
+
+      if $result ~~ Hit {
+
+        my $ship  = $game.ships.first({ so any(.coords) eqv $coords });
+        my $piece = $ship.pieces.first({ .coords eqv $coords });
+
+        $piece.hit   = True;
+        $piece.color = 'black';
+
+        say $ship.pieces>>.hit;
+
+      }
+
+      else {
+        say 'you missed!';
+      }
+
+    }
+
+    default {
+
+      say 'Sorry I did not understand that, try again';
+
+    }
+
+
+
+}  #$game.update: :$cmd;
+
+}
+
+sub init-ship ( :$owner ) {
 
   my Battleship::Ship @ship;
 
-  for Submarine, Submarine, Cruiser, Cruiser, Carrier -> $type {
+  for Frigate, Corvette, Destroyer, Cruiser, Carrier -> $type {
 
-    my @names = < s1 s2 c1 c2 c >;
-    my $name = @names[$++];
     #my $name = prompt "Enter $type name: ";
+
 
     #$name = prompt "Name alredy used, Enter new name: " while %ship{$name};
 
-    @ship.append: Battleship::Ship.new: :$name, :$type;
+    @ship.append: Battleship::Ship.new: :$owner, name => $type.Str, :$type;
 
   }
 
-  Battleship::Player.new: :$name, :@ship;
+  @ship;
 
 }
 

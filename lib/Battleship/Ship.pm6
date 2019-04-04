@@ -4,7 +4,7 @@ use Battleship::Ship::Piece;
 
 enum Name < Turtle Alligator Whale Bass Bonita Shark Seal Salmon Seawolf Tarpon Cuttlefish >;
 enum Direction < north south east west northeast northwest southeast southwest forward backward left right>;
-enum Type ( Submarine => 3, Cruiser => 5, Carrier => 7);
+enum Type ( Frigate => 3, Corvette => 3, Destroyer => 5, Cruiser => 5, Carrier => 7 );
 #enum Color < black red green yellow blue magenta cyan >;
 enum Color < blue >;
 enum State < Swim Sink >;
@@ -15,17 +15,19 @@ enum State < Swim Sink >;
 
 unit class Battleship::Ship;
 
-has Str       $.name is required;
-has Type      $.type is required;
+has Str       $.owner is required;
+has Str       $.name  is required;
+has Type      $.type  is required;
 has Piece     @.pieces;
 
 has State $!state;
 
-submethod BUILD ( Str :$!name, Type :$!type ) {
+submethod BUILD ( Str :$!name, Type :$!type, :$!owner ) {
 
-  my $shape = colored('■', Color.roll.Str);
+  my $shape = '■';
+  my $color = Color.roll.Str;
 
-  @!pieces.append: Piece.new: :$shape for ^$!type;
+  @!pieces.append: Piece.new: :$shape, :$color for ^$!type;
 
   $!state = Swim;
 

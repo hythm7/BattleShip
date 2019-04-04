@@ -8,3 +8,9 @@ has Int $!hits;
 has Int $!misses;
 
 has Battleship::Ship @.ship;
+
+method command ( ) {
+
+  $*IN.get;
+
+}
