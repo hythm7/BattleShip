@@ -12,6 +12,18 @@ has Int $.board-x = 20;
 has Str $.name = 'AI';
 
 
+
+method command ( ) {
+  sleep 2;
+
+  my $y = (^$.board-y).roll;
+  my $x = (^$.board-x).roll;
+
+  my $command = "f {$y} {$x}";
+
+  $command;
+}
+
 method hunt ( Type :$type = Destroyer ) {
 
   for self.filter-coords( :$type ) -> [ $y, $x ] {

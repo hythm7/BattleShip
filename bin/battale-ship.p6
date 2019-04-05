@@ -35,12 +35,13 @@ loop {
 
   #  my $player = @player[0];
 
-  $game.draw;
 
   print "{$player.name} > ";
 
   my $command = $player.command;
   #my $command = 'move Submarine0 west';
+
+  say $command;
 
   my $m = Battleship::Command.parse( $command, :actions(Battleship::CommandActions) );
 
@@ -50,14 +51,14 @@ loop {
   }
 
   else {
-  
     say 'Sorry I did not understand that, try again';
 
     next;
-
   }
 
-  $player = @player[$++ mod 2];
+  $game.draw;
+
+  $player = @player[++$ mod 2];
 }
 
 sub init-ship ( :$owner ) {

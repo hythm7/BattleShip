@@ -29,7 +29,7 @@ method draw ( ) {
 
   self.clear-board;
 
-  for @!ship.grep( *.visible ) -> $ship {
+  for @!ship -> $ship {
 
     @!board[.coords.y][.coords.x] = colored(.shape, .color) for $ship.piece;
 
@@ -42,7 +42,6 @@ method draw ( ) {
   say '';
   say '';
   say '';
-
 
   for @!player {
 
@@ -59,6 +58,7 @@ method check-shot ( Coords :$coords --> Fire ) {
 
   my $sym = colorstrip @!board[$coords.y][$coords.x];
 
+  say $sym;
   return Hit if  $sym eq '■';
   return Miss;
 
@@ -127,6 +127,8 @@ submethod update ( :$player, :%command ) {
   given %command<action> {
 
     when 'move' {
+
+      $player.moves += 1;
 
       my $name      = %command<ship>;
       my $direction = %command<direction>;

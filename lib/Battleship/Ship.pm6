@@ -5,8 +5,8 @@ use Battleship::Ship::Piece;
 enum Name < Turtle Alligator Whale Bass Bonita Shark Seal Salmon Seawolf Tarpon Cuttlefish >;
 enum Direction < north south east west northeast northwest southeast southwest forward backward left right>;
 enum Type ( Frigate => 3, Corvette => 3, Destroyer => 5, Cruiser => 5, Carrier => 7 );
-enum Color < red green yellow blue magenta cyan >;
-#enum Color < blue >;
+#enum Color < red green yellow blue magenta cyan >;
+enum Color < blue >;
 enum State < Swim Sink >;
 
 # TODO: head shot eq sink
