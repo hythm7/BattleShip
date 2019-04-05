@@ -19,47 +19,38 @@ has Player @.player[2];
 
 submethod BUILD ( Int :$!y = 20, Int :$!x = 20, :@!player, :@!ship ) {
 
-  # welcome
-  # init board
-  # print board
-  # init player
-  # place ships
-
-  #$!human = self.init-player;
-
   self.place-ships;
-
-  #self.draw;
-
-  #loop {
-
-  #  my $cmd = self.read-command;
-
-  #  self.update: :$cmd;
-  #  self.draw;
-  #}
+  self.draw;
 
 }
 
 
-method draw ( :$player ) {
+method draw ( ) {
 
   self.clear-board;
 
-  for @!ship -> $ship {
+  for @!ship.grep( *.visible ) -> $ship {
 
-    @!board[.coords.y][.coords.x] = colored(.shape, .color) for $ship.pieces;
+    @!board[.coords.y][.coords.x] = colored(.shape, .color) for $ship.piece;
 
   }
 
-  #clear;
+  clear;
 
   .put for @!board;
 
-}
+  say '';
+  say '';
+  say '';
 
 
-submethod update ( :$cmd ) {
+  for @!player {
+
+    say "{.name}:";
+    say "shots {.shots} misses {.misses} hits {.hits} moves {.moves}";
+    say '';
+
+  }
 
 
 }
@@ -81,7 +72,7 @@ submethod place-ships ( ) {
 
     my @coords = self.rand-coords: type => $ship.type;
 
-    .coords = @coords.shift for $ship.pieces;
+    .coords = @coords.shift for $ship.piece;
 
   }
 
@@ -123,10 +114,61 @@ method welcome ( ) {
 
 }
 
+
 method clear-board ( ) {
 
   @!board = [ WATER xx $!y ] xx $!x;
 
 }
+
+
+submethod update ( :$player, :%command ) {
+
+  given %command<action> {
+
+    when 'move' {
+
+      my $name      = %command<ship>;
+      my $direction = %command<direction>;
+
+      my $ship = @!ship.grep( *.owner eq $player.name ).first( *.name eq $name );
+      $ship.move: $direction if $ship;
+
+    }
+
+    when 'fire' {
+
+      $player.shots += 1;
+
+      my $coords = %command<coords>;
+
+      my $result = self.check-shot: :$coords;
+
+      if $result ~~ Hit {
+
+        $player.hits += 1;
+
+        my $ship  = @!ship.first({ so any(.coords) eqv $coords });
+        my $piece = $ship.piece.first({ .coords eqv $coords });
+
+        $piece.hit   = True;
+        $piece.color = 'black';
+
+        say $ship.piece>>.hit;
+
+      }
+
+      else {
+
+        $player.misses += 1;
+
+        say 'you missed!';
+      }
+
+    }
+
+  }
+}
+
 
 sub clear { print qx[clear] }

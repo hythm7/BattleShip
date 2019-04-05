@@ -47,7 +47,7 @@ class Battleship::CommandActions {
 
     my %h;
 
-    %h<cmd>    = $<fire>.ast;
+    %h<action>    = $<fire>.ast;
     %h<coords> = $<coords>.ast;
 
     make %h;
@@ -57,7 +57,7 @@ class Battleship::CommandActions {
 
     my %h;
 
-    %h<cmd>       = $<move>.ast;
+    %h<action>       = $<move>.ast;
     %h<direction> = $<direction>.ast;
     %h<ship>      = $<ship>.ast;
 
@@ -68,7 +68,7 @@ class Battleship::CommandActions {
 
     my %h;
 
-    %h<cmd>  = $<sink>.ast;
+    %h<action>  = $<sink>.ast;
     %h<ship> = $<ship>.ast;
 
     make %h;

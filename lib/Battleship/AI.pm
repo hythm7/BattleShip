@@ -10,15 +10,7 @@ has Int $.board-y = 20;
 has Int $.board-x = 20;
 
 has Str $.name = 'AI';
-has Battleship::Ship @.ship;
 
-submethod BUILD ( ) {
-
-  for Frigate, Corvette, Destroyer, Cruiser, Carrier -> $type {
-    @!ship.append: Battleship::Ship.new: owner => $!name, name => Name.pick.Str, :$type;
-  }
-
-}
 
 method hunt ( Type :$type = Destroyer ) {
 

@@ -24,72 +24,40 @@ for @player -> $player {
 
 }
 
+@ship.grep( *.owner eq $human.name ).map( { .visible = True } );
+
 my $game = Battleship.new: :@player, :@ship;
 
 
-#my $i = 2;
+my $player = $game.player[0];
 
 loop {
 
-#  my $player = @player[$i++ mod 2];
-  my $player = @player[0];
+  #  my $player = @player[0];
 
-  $game.draw: :$player;
+  $game.draw;
 
-  print 'Now what! > ';
+  print "{$player.name} > ";
 
   my $command = $player.command;
   #my $command = 'move Submarine0 west';
 
   my $m = Battleship::Command.parse( $command, :actions(Battleship::CommandActions) );
-  my %command = $m.ast if $m;
-
-  given %command<cmd> {
-
-    when 'move' {
-
-      my $name      = %command<ship>;
-      my $direction = %command<direction>;
-
-      my $ship = $game.ship.grep( *.owner eq $player.name ).first( *.name eq $name );
-      $ship.move: $direction if $ship;
-
-    }
-
-    when 'fire' {
-
-      my $coords = %command<coords>;
-
-      my $result = $game.check-shot: :$coords;
-
-      if $result ~~ Hit {
-
-        my $ship  = $game.ships.first({ so any(.coords) eqv $coords });
-        my $piece = $ship.pieces.first({ .coords eqv $coords });
-
-        $piece.hit   = True;
-        $piece.color = 'black';
-
-        say $ship.pieces>>.hit;
-
-      }
-
-      else {
-        say 'you missed!';
-      }
-
-    }
-
-    default {
-
-      say 'Sorry I did not understand that, try again';
-
-    }
 
 
+  if $m {
+    $game.update: :$player, command => $m.ast;
+  }
 
-}  #$game.update: :$cmd;
+  else {
+  
+    say 'Sorry I did not understand that, try again';
 
+    next;
+
+  }
+
+  $player = @player[$++ mod 2];
 }
 
 sub init-ship ( :$owner ) {
