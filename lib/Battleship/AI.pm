@@ -4,17 +4,17 @@ use Battleship::Ship;
 unit class Battleship::AI;
   also is Battleship::Player;
 
-enum Name < Ghost Salmon Deepblue Warrior Majesty >;
+enum Name < Ghost AI Majesty Camelia >;
+
+has Str $.name    = Name.pick.Str;
 
 has Int $.board-y = 20;
 has Int $.board-x = 20;
-
-has Str $.name = 'AI';
-
+has Int $.speed   = 2;
 
 
 method command ( ) {
-  sleep 2;
+  sleep 7 / $!speed;
 
   my $y = (^$.board-y).roll;
   my $x = (^$.board-x).roll;
@@ -34,7 +34,6 @@ method hunt ( Type :$type = Destroyer ) {
 method target ( :$y!, :$x!, Type :$type ) {
 
 
-  say "($y $x) ({$type.coords}) {$type.pieces}"
 
 }
 

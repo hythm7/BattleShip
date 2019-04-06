@@ -1,5 +1,6 @@
 use Terminal::ANSIColor;
-use Battleship::Player;
+use Battleship::Command;
+use Battleship::AI;
 use Battleship::Ship;
 
 enum Fire        < Miss Hit >;
@@ -9,19 +10,47 @@ constant WATER = colored('~', 'cyan');
 
 unit class Battleship;
 
-has Int    $.x;
-has Int    $.y;
-has Int    $.count;
+has Int    $!x;
+has Int    $!y;
+has Int    $!ships;
 has        @!board;
 has Ship   @.ship;
 has Player @.player[2];
 
+multi method new ( Str :$name!, Int :$y!, Int :$x!, Int :$ships!, :$speed! ) {
 
-submethod BUILD ( Int :$!y = 20, Int :$!x = 20, :@!player, :@!ship ) {
+  my Player @player;
+
+  my $player1 = Player.new: :$name;
+  my $player2 = AI.new: board-y => $y, board-x => $x, :$speed;
+
+  @player.append: $player1, $player2;
+
+  self.bless( :@player, :$y, :$x, :$ships )
+
+}
+
+multi method new ( Bool :$ai!, Int :$y!, Int :$x!, Int :$ships!, :$speed! ) {
+
+  my Player @player;
+
+  my $player1 = AI.new: board-y => $y, board-x => $x, :$speed;
+  my $player2 = AI.new: board-y => $y, board-x => $x, :$speed;
+
+  @player.append: $player1, $player2;
+
+  self.bless( :@player, :$y, :$x, :$ships )
+
+}
+
+
+submethod BUILD ( Player :@!player, Int :$!y, Int :$!x, Int :$!ships ) {
+
+  @!ship = self.create-ships;
 
   self.place-ships;
-  self.draw;
 
+  self.draw;
 }
 
 
@@ -31,7 +60,7 @@ method draw ( ) {
 
   for @!ship -> $ship {
 
-    @!board[.coords.y][.coords.x] = colored(.shape, .color) for $ship.piece;
+    @!board[.coords.y][.coords.x] = colored(.shape, .color) for $ship.part;
 
   }
 
@@ -65,6 +94,23 @@ method check-shot ( Coords :$coords --> Fire ) {
 }
 
 
+submethod create-ships {
+
+  my @ship;
+
+  for @!player { 
+
+    for Frigate, Corvette, Destroyer, Cruiser, Carrier -> $type {
+
+      @ship.append: Ship.new: owner => .name, :$type;
+
+    }
+
+  }
+
+  @ship;
+
+}
 
 submethod place-ships ( ) {
 
@@ -72,7 +118,7 @@ submethod place-ships ( ) {
 
     my @coords = self.rand-coords: type => $ship.type;
 
-    .coords = @coords.shift for $ship.piece;
+    .coords = @coords.shift for $ship.part;
 
   }
 
@@ -151,12 +197,12 @@ submethod update ( :$player, :%command ) {
         $player.hits += 1;
 
         my $ship  = @!ship.first({ so any(.coords) eqv $coords });
-        my $piece = $ship.piece.first({ .coords eqv $coords });
+        my $part = $ship.part.first({ .coords eqv $coords });
 
-        $piece.hit   = True;
-        $piece.color = 'black';
+        $part.hit   = True;
+        $part.color = 'black';
 
-        say $ship.piece>>.hit;
+        say $ship.part>>.hit;
 
       }
 
@@ -172,5 +218,35 @@ submethod update ( :$player, :%command ) {
   }
 }
 
+method run ( ) {
+
+  my $player = @!player.first;
+
+  loop {
+
+
+    print "{$player.name} > ";
+
+    my $command = $player.command;
+
+    my $m = Battleship::Command.parse( $command, :actions(Battleship::CommandActions) );
+
+
+    if $m {
+      self.update: :$player, command => $m.ast;
+    }
+
+    else {
+      say 'Sorry I did not understand that, try again';
+
+      next;
+    }
+
+    self.draw;
+
+    $player = @!player[++$ mod 2];
+  }
+
+}
 
 sub clear { print qx[clear] }
