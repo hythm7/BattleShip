@@ -1,19 +1,18 @@
-use Terminal::ANSIColor;
 use Battleship::Command;
+use Battleship::Board;
 use Battleship::AI;
 use Battleship::Ship;
 
 enum Fire        < Miss Hit >;
 enum Orientation < Horizontal Vertical Diagonal >;
 
-constant WATER = colored('~', 'cyan');
 
 unit class Battleship;
 
 has Int    $!x;
 has Int    $!y;
 has Int    $!ships;
-has        @!board;
+has Board  $!board;
 has Ship   @.ship;
 has Player @.player[2];
 
@@ -46,27 +45,24 @@ multi method new ( Bool :$ai!, Int :$y!, Int :$x!, Int :$ships!, :$speed! ) {
 
 submethod BUILD ( Player :@!player, Int :$!y, Int :$!x, Int :$!ships ) {
 
-  @!ship = self.create-ships;
 
-  self.place-ships;
+  @!ship = self.create-ships;
+  self.set-ships-coords;
+
+  $!board = Board.new: :$!y, :$!x;
+  $!board.place-ships: :@!ship;
 
   self.draw;
+
+  #say @!ship>>.coords>>.Str;
 }
 
 
 method draw ( ) {
 
-  self.clear-board;
+  #clear;
 
-  for @!ship -> $ship {
-
-    @!board[.coords.y][.coords.x] = colored(.shape, .color) for $ship.part;
-
-  }
-
-  clear;
-
-  .put for @!board;
+  $!board.draw;
 
   say '';
   say '';
@@ -85,7 +81,7 @@ method draw ( ) {
 
 method check-shot ( Coords :$coords --> Fire ) {
 
-  my $sym = colorstrip @!board[$coords.y][$coords.x];
+  my $sym = $!board.cell[$coords.y][$coords.x].sym;
 
   say $sym;
   return Hit if  $sym eq '■';
@@ -100,19 +96,24 @@ submethod create-ships {
 
   for @!player { 
 
+    my Bool $hidden;
+
+    $hidden = True when AI;
+
     for Frigate, Corvette, Destroyer, Cruiser, Carrier -> $type {
 
-      @ship.append: Ship.new: owner => .name, :$type;
+      @ship.append: Ship.new: owner => .name, :$type, :$hidden;
 
     }
 
   }
 
+
   @ship;
 
 }
 
-submethod place-ships ( ) {
+submethod set-ships-coords ( ) {
 
   for @!ship -> $ship {
 
@@ -121,6 +122,8 @@ submethod place-ships ( ) {
     .coords = @coords.shift for $ship.part;
 
   }
+
+
 
 }
 
@@ -161,13 +164,6 @@ method welcome ( ) {
 }
 
 
-method clear-board ( ) {
-
-  @!board = [ WATER xx $!y ] xx $!x;
-
-}
-
-
 submethod update ( :$player, :%command ) {
 
   given %command<action> {
@@ -181,6 +177,7 @@ submethod update ( :$player, :%command ) {
 
       my $ship = @!ship.grep( *.owner eq $player.name ).first( *.name eq $name );
       $ship.move: $direction if $ship;
+
 
     }
 
@@ -200,9 +197,10 @@ submethod update ( :$player, :%command ) {
         my $part = $ship.part.first({ .coords eqv $coords });
 
         $part.hit   = True;
+        say $part.color;
         $part.color = 'black';
+        say $part.color;
 
-        say $ship.part>>.hit;
 
       }
 
@@ -216,6 +214,8 @@ submethod update ( :$player, :%command ) {
     }
 
   }
+
+  $!board.place-ships: :@!ship;
 }
 
 method run ( ) {

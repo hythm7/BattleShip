@@ -16,9 +16,10 @@ unit class Battleship::Ship;
 
 my class Part {
 
-  has Str  $.shape is rw  = '■';
-  has Str  $.color is rw;
-  has Bool $.hit   is rw  = False;
+  has Str  $.shape  is rw  = '■';
+  has Str  $.color  is rw;
+  has Bool $.hit    is rw  = False;
+  has Bool $.hidden        = False;
 
   has Battleship::Coords $.coords is rw;
 
@@ -32,8 +33,10 @@ my class Part {
 has Str   $.owner   is required;
 has Type  $.type    is required;
 has Name  $.name;
-has Part @.part;
 
+has Bool  $.hidden = False;
+
+has Part @.part;
 has State $!state;
 
 submethod TWEAK ( ) {
@@ -42,7 +45,7 @@ submethod TWEAK ( ) {
   my $name  = Name.pick;
   my $color = Color.pick.Str;
 
-  @!part.append: Part.new: :$shape, :$color for ^$!type;
+  @!part.append: Part.new: :$shape, :$color, :$!hidden for ^$!type;
 
   $!state = Swim;
 
