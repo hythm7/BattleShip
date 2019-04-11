@@ -4,8 +4,8 @@ use Battleship::Coords;
 enum Name < Turtle Alligator Whale Bass Bonita Shark Seal Salmon Seawolf Tarpon Cuttlefish >;
 enum Direction < north south east west northeast northwest southeast southwest forward backward left right>;
 enum Type ( Frigate => 3, Corvette => 3, Destroyer => 5, Cruiser => 5, Carrier => 7 );
-#enum Color < red green yellow blue magenta cyan >;
-enum Color < blue >;
+enum Color < red green yellow blue magenta cyan black >;
+#enum Color < blue >;
 enum State < Swim Sink >;
 
 # TODO: head shot eq sink
@@ -17,7 +17,7 @@ unit class Battleship::Ship;
 my class Part {
 
   has Str  $.shape  is rw  = '■';
-  has Str  $.color  is rw;
+  has Color  $.color  is rw;
   has Bool $.hit    is rw  = False;
   has Bool $.hidden        = False;
 
@@ -33,6 +33,7 @@ my class Part {
 has Str   $.owner   is required;
 has Type  $.type    is required;
 has Name  $.name;
+has Color $.color = Color.pick;
 
 has Bool  $.hidden = False;
 
@@ -43,9 +44,8 @@ submethod TWEAK ( ) {
 
   my $shape = '■';
   my $name  = Name.pick;
-  my $color = Color.pick.Str;
 
-  @!part.append: Part.new: :$shape, :$color, :$!hidden for ^$!type;
+  @!part.append: Part.new: :$shape, :$!color, :$!hidden for ^$!type;
 
   $!state = Swim;
 

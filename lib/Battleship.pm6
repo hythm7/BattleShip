@@ -84,15 +84,18 @@ method check-shot ( Coords :$coords --> Fire ) {
 }
 
 
-submethod create-ships ( ) {
+submethod create-ships ( Player :$player ) {
 
   for @!player {
 
-    my Bool $hidden;
-    $hidden = .hidden when AI;
+    my Bool  $hidden;
+    my Color $color;
+
+    $color  = Color.pick;
+    $hidden = .hidden        when AI;
 
     for Frigate, Corvette, Destroyer, Cruiser, Carrier -> $type {
-      @!ship.append: Ship.new: owner => .name, :$type, :$hidden;
+      @!ship.append: Ship.new: owner => .name, :$color, :$type, :$hidden;
     }
   }
 }
@@ -180,7 +183,7 @@ submethod process-command ( :$player, :%command ) {
         my $part = $ship.part.first({ .coords eqv $coords });
 
         $part.hit   = True;
-        $part.color = 'black';
+        $part.color = black;
       }
     }
   }

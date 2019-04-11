@@ -6,17 +6,17 @@ unit class Board;
 my class Cell {
 
   constant WATER      = '~';
-  constant WATERCOLOR = 'cyan';
+  constant WATERCOLOR = cyan;
 
-  has Str  $.sym    = WATER;
-  has Str  $.color  = WATERCOLOR;
-  has Bool $.hidden = False;
+  has Str   $.sym    = WATER;
+  has Color  $.color = cyan;
+  has Bool  $.hidden = False;
 
   method Str ( ) {
 
-    return colored(WATER, WATERCOLOR) if $!hidden;
+    return colored(WATER, WATERCOLOR.Str) if $!hidden;
 
-    return colored($!sym, $!color);
+    return colored($!sym, $!color.Str);
   }
 }
 
