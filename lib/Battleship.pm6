@@ -16,12 +16,12 @@ has Board  $!board;
 has Ship   @.ship;
 has Player @.player[2];
 
-multi method new ( Str :$name!, Int :$y!, Int :$x!, Int :$ships!, Int :$speed! ) {
+multi method new ( Str :$name!, Int :$y!, Int :$x!, Int :$ships!, Int :$speed!, Bool :$hidden ) {
 
   my Player @player;
 
   my $player1 = Player.new: :$name;
-  my $player2 = AI.new: board-y => $y, board-x => $x, :$speed;
+  my $player2 = AI.new: board-y => $y, board-x => $x, :$speed, :$hidden;
 
   @player.append: $player1, $player2;
 
@@ -58,6 +58,7 @@ submethod BUILD ( Player :@!player, Int :$!y, Int :$!x, Int :$!ships ) {
 
 method draw ( ) {
 
+  say '';
   #clear;
 
   $!board.draw;
@@ -68,7 +69,7 @@ method draw ( ) {
   for @!player {
 
     say "{.name}:";
-    say "shots {.shots} misses {.misses} hits {.hits} moves {.moves}";
+    say "shots {.shots} hits {.hits} moves {.moves}";
     say '';
 
   }
@@ -147,7 +148,7 @@ method welcome ( ) {
 }
 
 
-submethod update ( :$player, :%command ) {
+submethod process-command ( :$player, :%command ) {
 
   given %command<action> {
 
@@ -169,7 +170,6 @@ submethod update ( :$player, :%command ) {
       $player.shots += 1;
 
       my $coords = %command<coords>;
-
       my $result = self.check-shot: :$coords;
 
       if $result ~~ Hit {
@@ -181,51 +181,32 @@ submethod update ( :$player, :%command ) {
 
         $part.hit   = True;
         $part.color = 'black';
-
-
       }
-
-      else {
-
-        $player.misses += 1;
-
-        say 'you missed!';
-      }
-
     }
-
   }
+
+}
+
+submethod update ( ) {
 
   $!board.place-ships: :@!ship;
 }
 
 method run ( ) {
 
-  my $player = @!player.first;
-
   loop {
 
+    my $player = @!player[$++ mod 2];
 
     print "{$player.name} > ";
 
-    my $command = $player.command;
+    print 'Sorry I did not understand that, try again > '
+      until my $command = Command.parse( $player.command, actions => Actions ).ast;
 
-    my $m = Battleship::Command.parse( $command, :actions(Battleship::CommandActions) );
-
-
-    if $m {
-      self.update: :$player, command => $m.ast;
-    }
-
-    else {
-      say 'Sorry I did not understand that, try again';
-
-      next;
-    }
-
+    self.process-command: :$player, :$command;
+    self.update;
     self.draw;
 
-    $player = @!player[++$ mod 2];
   }
 
 }

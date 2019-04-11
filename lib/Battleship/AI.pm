@@ -6,11 +6,11 @@ unit class Battleship::AI;
 
 enum Name < Ghost AI Majesty Camelia >;
 
-has Str $.name     = Name.pick.Str;
+has Str  $.name    = Name.pick.Str;
 has Bool $.hidden  = False;
 has Int  $.board-y = 20;
 has Int  $.board-x = 20;
-has Int  $.speed   = 2;
+has Int  $.speed   = 7;
 
 
 method command ( ) {

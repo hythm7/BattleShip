@@ -2,7 +2,6 @@ use Battleship::Coords;
 
 grammar Battleship::Command {
 
-
   proto token TOP { * }
   rule TOP:sym<fire> { <fire> <coords>  }
   rule TOP:sym<move> { <move> <ship> <direction>  }
@@ -40,14 +39,14 @@ grammar Battleship::Command {
 
 }
 
-class Battleship::CommandActions {
+class Battleship::Actions {
 
 
   method TOP:sym<fire> ( $/ ) {
 
     my %h;
 
-    %h<action>    = $<fire>.ast;
+    %h<action> = $<fire>.ast;
     %h<coords> = $<coords>.ast;
 
     make %h;

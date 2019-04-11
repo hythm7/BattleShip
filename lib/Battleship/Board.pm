@@ -41,7 +41,7 @@ method place-ships ( Battleship::Ship :@ship ) {
   for @ship -> $ship {
 
     @!cell[.coords.y][.coords.x] = Cell.new(
-          sym => .shape, color => .color, hidden => .hidden ) for $ship.part;
+      sym => .shape, color => .color, hidden => .hidden ) for $ship.part;
   }
 }
 
@@ -54,7 +54,7 @@ method draw ( ) {
 method clear ( ) {
 
   @!cell = [ [ Cell.new xx $!y ] xx $!x ];
-  
+
 }
 
 
