@@ -17,12 +17,12 @@ $game.run;
 
 }
 
-multi MAIN ( Bool :$ai!, Int :$y = 20, Int :$x = 20, Int :$ships = 10, Int :$speed = 4 ) {
+multi MAIN ( Bool :$ai!, Int :$y = 20, Int :$x = 20, Int :$ships = 10, Int :$speed = 4, :$hidden = False ) {
 
 welcome;
 
 
-my $game = Battleship.new: :$ai, :$y, :$x, :$ships, :$speed;
+my $game = Battleship.new: :$ai, :$y, :$x, :$ships, :$speed, :$hidden;
 
 
 $game.run;

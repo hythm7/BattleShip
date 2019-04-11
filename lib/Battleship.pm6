@@ -16,7 +16,7 @@ has Board  $!board;
 has Ship   @.ship;
 has Player @.player[2];
 
-multi method new ( Str :$name!, Int :$y!, Int :$x!, Int :$ships!, :$speed! ) {
+multi method new ( Str :$name!, Int :$y!, Int :$x!, Int :$ships!, Int :$speed! ) {
 
   my Player @player;
 
@@ -29,12 +29,12 @@ multi method new ( Str :$name!, Int :$y!, Int :$x!, Int :$ships!, :$speed! ) {
 
 }
 
-multi method new ( Bool :$ai!, Int :$y!, Int :$x!, Int :$ships!, :$speed! ) {
+multi method new ( Bool :$ai!, Int :$y!, Int :$x!, Int :$ships!, Int :$speed!, Bool :$hidden! ) {
 
   my Player @player;
 
   my $player1 = AI.new: board-y => $y, board-x => $x, :$speed;
-  my $player2 = AI.new: board-y => $y, board-x => $x, :$speed;
+  my $player2 = AI.new: board-y => $y, board-x => $x, :$speed, :$hidden;
 
   @player.append: $player1, $player2;
 
@@ -45,8 +45,7 @@ multi method new ( Bool :$ai!, Int :$y!, Int :$x!, Int :$ships!, :$speed! ) {
 
 submethod BUILD ( Player :@!player, Int :$!y, Int :$!x, Int :$!ships ) {
 
-
-  @!ship = self.create-ships;
+  self.create-ships;
   self.set-ships-coords;
 
   $!board = Board.new: :$!y, :$!x;
@@ -54,7 +53,6 @@ submethod BUILD ( Player :@!player, Int :$!y, Int :$!x, Int :$!ships ) {
 
   self.draw;
 
-  #say @!ship>>.coords>>.Str;
 }
 
 
@@ -66,7 +64,6 @@ method draw ( ) {
 
   say '';
   say '';
-  say '';
 
   for @!player {
 
@@ -75,42 +72,28 @@ method draw ( ) {
     say '';
 
   }
-
-
 }
 
 method check-shot ( Coords :$coords --> Fire ) {
 
   my $sym = $!board.cell[$coords.y][$coords.x].sym;
 
-  say $sym;
   return Hit if  $sym eq '■';
   return Miss;
-
 }
 
 
-submethod create-ships {
+submethod create-ships ( ) {
 
-  my @ship;
-
-  for @!player { 
+  for @!player {
 
     my Bool $hidden;
-
-    $hidden = True when AI;
+    $hidden = .hidden when AI;
 
     for Frigate, Corvette, Destroyer, Cruiser, Carrier -> $type {
-
-      @ship.append: Ship.new: owner => .name, :$type, :$hidden;
-
+      @!ship.append: Ship.new: owner => .name, :$type, :$hidden;
     }
-
   }
-
-
-  @ship;
-
 }
 
 submethod set-ships-coords ( ) {
@@ -197,9 +180,7 @@ submethod update ( :$player, :%command ) {
         my $part = $ship.part.first({ .coords eqv $coords });
 
         $part.hit   = True;
-        say $part.color;
         $part.color = 'black';
-        say $part.color;
 
 
       }
