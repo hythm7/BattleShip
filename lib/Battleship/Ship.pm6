@@ -5,7 +5,6 @@ enum Name < Turtle Alligator Whale Bass Bonita Shark Seal Salmon Seawolf Tarpon 
 enum Direction < north south east west northeast northwest southeast southwest forward backward left right>;
 enum Type ( Frigate => 3, Corvette => 3, Destroyer => 5, Cruiser => 5, Carrier => 7 );
 enum Color < red green yellow blue magenta cyan black >;
-#enum Color < blue >;
 enum State < Swim Sink >;
 
 # TODO: head shot eq sink
@@ -16,10 +15,10 @@ unit class Battleship::Ship;
 
 my class Part {
 
-  has Str  $.shape  is rw  = '■';
-  has Color  $.color  is rw;
-  has Bool $.hit    is rw  = False;
-  has Bool $.hidden        = False;
+  has Str   $.shape  is rw  = '■';
+  has Color $.color  is rw;
+  has Bool  $.hit    is rw  = False;
+  has Bool  $.hidden        = False;
 
   has Battleship::Coords $.coords is rw;
 

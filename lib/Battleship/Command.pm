@@ -1,5 +1,7 @@
 use Battleship::Coords;
 
+enum Commands < fire move sink >;
+
 grammar Battleship::Command {
 
   proto token TOP { * }
@@ -56,9 +58,9 @@ class Battleship::Actions {
 
     my %h;
 
-    %h<action>       = $<move>.ast;
+    %h<name>      = $<ship>.ast;
+    %h<action>    = $<move>.ast;
     %h<direction> = $<direction>.ast;
-    %h<ship>      = $<ship>.ast;
 
     make %h;
   }
@@ -67,20 +69,20 @@ class Battleship::Actions {
 
     my %h;
 
-    %h<action>  = $<sink>.ast;
-    %h<ship> = $<ship>.ast;
+    %h<ship>   = $<ship>.ast;
+    %h<action> = $<sink>.ast;
 
     make %h;
   }
 
-  method fire:sym<f> ( $/ )    { make 'fire' }
-  method fire:sym<fire> ( $/ ) { make 'fire' }
+  method fire:sym<f>    ( $/ ) { make fire }
+  method fire:sym<fire> ( $/ ) { make fire }
 
-  method move:sym<m> ( $/ )    { make 'move' }
-  method move:sym<move> ( $/ ) { make 'move' }
+  method move:sym<m>    ( $/ ) { make move }
+  method move:sym<move> ( $/ ) { make move }
 
-  method sink:sym<s> ( $/ )    { make 'sink' }
-  method sink:sym<sink> ( $/ ) { make 'sink' }
+  method sink:sym<s>    ( $/ ) { make Command::sink }
+  method sink:sym<sink> ( $/ ) { make Command::sink}
 
   method direction:sym<l>        ( $/ ) { make 'left' }
   method direction:sym<r>        ( $/ ) { make 'right' }

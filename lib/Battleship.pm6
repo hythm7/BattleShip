@@ -91,8 +91,9 @@ submethod create-ships ( Player :$player ) {
     my Bool  $hidden;
     my Color $color;
 
-    $color  = Color.pick;
-    $hidden = .hidden        when AI;
+    $color  = Color.pick(*).sort.skip(3).head;
+
+    $hidden = .hidden when AI;
 
     for Frigate, Corvette, Destroyer, Cruiser, Carrier -> $type {
       @!ship.append: Ship.new: owner => .name, :$color, :$type, :$hidden;
@@ -151,43 +152,32 @@ method welcome ( ) {
 }
 
 
-submethod process-command ( :$player, :%command ) {
-
-  given %command<action> {
-
-    when 'move' {
+multi method command ( :$action where move, Str :$name, Direction :$direction, Player :$player ) {
 
       $player.moves += 1;
 
-      my $name      = %command<ship>;
-      my $direction = %command<direction>;
-
       my $ship = @!ship.grep( *.owner eq $player.name ).first( *.name eq $name );
       $ship.move: $direction if $ship;
+}
 
+multi method command ( :$action where fire, Coords :$coords, Player :$player ) {
 
-    }
+  $player.shots += 1;
 
-    when 'fire' {
+  my $result = self.check-shot: :$coords;
 
-      $player.shots += 1;
+  if $result ~~ Hit {
 
-      my $coords = %command<coords>;
-      my $result = self.check-shot: :$coords;
+    $player.hits += 1;
 
-      if $result ~~ Hit {
+    my $ship  = @!ship.first({ so any(.coords) eqv $coords });
+    my $part = $ship.part.first({ .coords eqv $coords });
 
-        $player.hits += 1;
+    $part.hit   = True;
+    $part.color = black;
 
-        my $ship  = @!ship.first({ so any(.coords) eqv $coords });
-        my $part = $ship.part.first({ .coords eqv $coords });
-
-        $part.hit   = True;
-        $part.color = black;
-      }
-    }
+    @!ship .= grep: not * eqv $ship if all $ship.part.map(*.hit);
   }
-
 }
 
 submethod update ( ) {
@@ -204,9 +194,9 @@ method run ( ) {
     print "{$player.name} > ";
 
     print 'Sorry I did not understand that, try again > '
-      until my $command = Command.parse( $player.command, actions => Actions ).ast;
+      until my %cmd = Command.parse( $player.command, actions => Actions ).ast;
 
-    self.process-command: :$player, :$command;
+    self.command: :$player, |%cmd;
     self.update;
     self.draw;
 

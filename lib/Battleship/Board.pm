@@ -5,17 +5,15 @@ unit class Board;
 
 my class Cell {
 
-  constant WATER      = '~';
-  constant WATERCOLOR = cyan;
+  constant water      = '~';
 
-  has Str   $.sym    = WATER;
-  has Color  $.color = cyan;
+  has Str   $.sym    = water;
+  has Color $.color  = cyan;
   has Bool  $.hidden = False;
 
   method Str ( ) {
 
-    return colored(WATER, WATERCOLOR.Str) if $!hidden;
-
+    return colored(water, ~cyan) if $!hidden;
     return colored($!sym, $!color.Str);
   }
 }
@@ -25,15 +23,6 @@ has $.y;
 has $.x;
 has @.cell;
 
-#method new ( Int :$y, Int :$x ) {
-
-
-#    my @values = [ [ Cell.new xx $y ] xx $x ];
-
-
-        #nextwith(|@values);
-
-        #}
 method place-ships ( Battleship::Ship :@ship ) {
 
   self.clear;
