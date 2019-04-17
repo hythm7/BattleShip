@@ -51,7 +51,7 @@ submethod BUILD ( Player :@!player, Int :$!y, Int :$!x, Int :$!ships ) {
   $!board = Board.new: :$!y, :$!x;
   $!board.place-ships: :@!ship;
 
-  self.draw;
+  #self.draw;
 
 }
 
@@ -66,14 +66,7 @@ method draw ( ) {
   say '';
   say '';
 
-  for @!player {
-
-    say "{.name}:";
-    say "shots {.shots} hits {.hits} moves {.moves}";
-    say '';
-
   }
-}
 
 method check-shot ( Coords :$coords --> Fire ) {
 
@@ -183,11 +176,15 @@ multi method command ( :$action where fire, Coords :$coords, Player :$player ) {
 submethod update ( ) {
 
   $!board.place-ships: :@!ship;
+  last if [eq] @!ship>>.owner;
 }
 
 method run ( ) {
 
+my $i;
   loop {
+
+ say $i++;
 
     my $player = @!player[$++ mod 2];
 
@@ -200,6 +197,13 @@ method run ( ) {
     self.update;
     self.draw;
 
+    LAST {
+      for @!player {
+        say "{.name}:";
+        say "shots {.shots} hits {.hits} moves {.moves}";
+        say '';
+      }
+    }
   }
 
 }
