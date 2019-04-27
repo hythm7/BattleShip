@@ -1,9 +1,10 @@
 use Battleship::Command;
+use Battleship::Enum;
 use Battleship::Board;
 use Battleship::AI;
 use Battleship::Ship;
 
-enum Fire        < Miss Hit >;
+#enum Fire        < Miss Hit >;
 enum Orientation < Horizontal Vertical Diagonal >;
 
 
@@ -16,34 +17,50 @@ has Board  $!board;
 has Ship   @.ship;
 has Player @.player[2];
 
+has Channel $!p1-channel;
+has Channel $!p2-channel;
+has Supply  $!action;
+
 multi method new ( Str :$name!, Int :$y!, Int :$x!, Int :$ships!, Int :$speed!, Bool :$hidden ) {
+
+  my $server = Channel.new;
+  my $action = $server.Supply;
+
+  my $p1-channel = Channel.new;
+  my $p2-channel = Channel.new;
 
   my Player @player;
 
-  my $player1 = Player.new: :$name;
-  my $player2 = AI.new: board-y => $y, board-x => $x, :$speed, :$hidden;
+  my $player1 = Player.new: :$name, :$server, events => $p1-channel.Supply;
+  my $player2 = AI.new: :$server, events => $p2-channel.Supply, board-y => $y, board-x => $x, :$speed, :$hidden;
 
   @player.append: $player1, $player2;
 
-  self.bless( :@player, :$y, :$x, :$ships )
+  self.bless( :@player, :$action, :$p1-channel, :$p2-channel,  :$y, :$x, :$ships )
 
 }
 
 multi method new ( Bool :$ai!, Int :$y!, Int :$x!, Int :$ships!, Int :$speed!, Bool :$hidden! ) {
 
+  my $server = Channel.new;
+  my $action = $server.Supply;
+
+  my $p1-channel = Channel.new;
+  my $p2-channel = Channel.new;
+
   my Player @player;
 
-  my $player1 = AI.new: board-y => $y, board-x => $x, :$speed;
-  my $player2 = AI.new: board-y => $y, board-x => $x, :$speed, :$hidden;
+  my $player1 = AI.new: :$server, events => $p1-channel.Supply,board-y => $y, board-x => $x, :$speed;
+  my $player2 = AI.new: :$server, events => $p2-channel.Supply,board-y => $y, board-x => $x, :$speed, :$hidden;
 
   @player.append: $player1, $player2;
 
-  self.bless( :@player, :$y, :$x, :$ships )
+  self.bless( :@player, :$action, :$p1-channel, :$p2-channel, :$y, :$x, :$ships )
 
 }
 
 
-submethod BUILD ( Player :@!player, Int :$!y, Int :$!x, Int :$!ships ) {
+submethod BUILD ( :$!action, :$!p1-channel, :$!p2-channel, Player :@!player, Int :$!y, Int :$!x, Int :$!ships ) {
 
   self.create-ships;
   self.set-ships-coords;
@@ -51,7 +68,11 @@ submethod BUILD ( Player :@!player, Int :$!y, Int :$!x, Int :$!ships ) {
   $!board = Board.new: :$!y, :$!x;
   $!board.place-ships: :@!ship;
 
-  #self.draw;
+  start self.serve;
+  sleep 1;
+  start @!player.head.play; 
+  sleep 1;
+  @!player.tail.play; 
 
 }
 
@@ -179,22 +200,38 @@ submethod update ( ) {
   last if [eq] @!ship.map(*.owner);
 }
 
-method run ( ) {
+method serve ( ) {
 
-  loop {
+  my @player = $!p1-channel, $!p2-channel;
+  my $player = @player.head;
 
-    my $player = @!player[$++ mod 2];
+  react {
+    whenever $!action {
+      when Battleship::Coords {
+      $player.send($!board.cell[.y][.x].sym ~~ '■' ?? Hit !! Miss);
 
-    print "{$player.name} > ";
+      $player = @player.first( * !=== $player);
+      $player.send(Start);
+      }
+    }
 
-    print 'Sorry I did not understand that, try again > '
-      until my %cmd = Command.parse( $player.command, actions => Actions ).ast;
-
-    self.command: :$player, |%cmd;
-    self.update;
-    self.draw;
-
+    $player.send(Start);
   }
+
+  #  loop {
+  #
+  #    my $player = @!player[$++ mod 2];
+  #
+  #    print "{$player.name} > ";
+  #
+  #    print 'Sorry I did not understand that, try again > '
+  #      until my %cmd = Command.parse( $player.command, actions => Actions ).ast;
+  #
+  #    self.command: :$player, |%cmd;
+  #    self.update;
+  #    self.draw;
+  #
+  #  }
 
   say '';
   say '';
