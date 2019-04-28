@@ -1,4 +1,4 @@
-use Battleship::Enum;
+use Battleship::Utils;
 use Battleship::Ship;
 
 unit class Battleship::Player;
@@ -10,8 +10,8 @@ has Int $.moves  is rw = 0;
 
 has Battleship::Ship @.ship;
 
-has Channel $.server;
-has Supply  $.events;
+has Channel $.server is rw;
+has Supply  $.events is rw;
 
 method play {
   react {
