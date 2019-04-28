@@ -1,6 +1,8 @@
+use Battleship::Play::Fire;
+use Battleship::Play::Move;
+use Battleship::Play::Sink;
 use Battleship::Coords;
 
-enum Commands < fire move sink >;
 
 grammar Battleship::Command {
 
@@ -41,48 +43,45 @@ grammar Battleship::Command {
 
 }
 
-class Battleship::Actions {
+class Command::Actions {
 
+  has $.player;
 
   method TOP:sym<fire> ( $/ ) {
 
-    my %h;
 
-    %h<action> = $<fire>.ast;
-    %h<coords> = $<coords>.ast;
+    my $play   = $<fire>.ast;
+    my $coords = $<coords>.ast;
 
-    make %h;
+    make Battleship::Play::Fire.new: :$!player, :$play, :$coords;
   }
 
   method TOP:sym<move> ( $/ ) {
 
-    my %h;
+    my $ship      = $<ship>.ast;
+    my $play      = $<move>.ast;
+    my $direction = $<direction>.ast;
 
-    %h<name>      = $<ship>.ast;
-    %h<action>    = $<move>.ast;
-    %h<direction> = $<direction>.ast;
-
-    make %h;
+    make Battleship::Play::Move.new: :$!player, :$play, :$ship, :$direction;
   }
 
   method TOP:sym<sink> ( $/ ) {
 
-    my %h;
+    my $ship      = $<ship>.ast;
+    my $play      = $<move>.ast;
 
-    %h<ship>   = $<ship>.ast;
-    %h<action> = $<sink>.ast;
+    make Battleship::Play::Move.new: :$!player, :$play, :$ship;
 
-    make %h;
   }
 
-  method fire:sym<f>    ( $/ ) { make fire }
-  method fire:sym<fire> ( $/ ) { make fire }
+  method fire:sym<f>    ( $/ ) { make 'fire' }
+  method fire:sym<fire> ( $/ ) { make 'fire' }
 
-  method move:sym<m>    ( $/ ) { make move }
-  method move:sym<move> ( $/ ) { make move }
+  method move:sym<m>    ( $/ ) { make 'move' }
+  method move:sym<move> ( $/ ) { make 'move' }
 
-  method sink:sym<s>    ( $/ ) { make Command::sink }
-  method sink:sym<sink> ( $/ ) { make Command::sink}
+  method sink:sym<s>    ( $/ ) { make 'sink' }
+  method sink:sym<sink> ( $/ ) { make 'sink'} 
 
   method direction:sym<l>        ( $/ ) { make 'left' }
   method direction:sym<r>        ( $/ ) { make 'right' }

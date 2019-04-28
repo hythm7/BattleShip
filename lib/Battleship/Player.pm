@@ -1,5 +1,7 @@
 use Battleship::Utils;
+use Battleship::Play;
 use Battleship::Ship;
+use Battleship::Command;
 
 unit class Battleship::Player;
 
@@ -17,21 +19,30 @@ method play {
   react {
     whenever $!events {
       when Start {
-        sleep .2;
-        $!server.send: Battleship::Coords.new(x => (^10).pick, y => (^10).pick);
+        #sleep .2;
+        $!server.send: self.command;
       }
       when Hit {
-        say "I hit that! +1 gold coin!";
+        #say "I hit that! +1 gold coin!";
       }
       when Miss {
-        say "No, that's a miss... -1 bullet!";
+        #say "No, that's a miss... -1 bullet!";
+      }
+      when Won {
+        done;
+      }
+      when Lost {
+        done;
       }
     }
   }
 }
 
-method command ( ) {
+method command ( --> Battleship::Play ) {
 
-  $*IN.get;
+  print 'Sorry I did not understand that, try again > '
+  until my $play = Battleship::Command.parse( get, actions => Command::Actions.new(:$!name) ).ast;
+
+  $play;
 
 }

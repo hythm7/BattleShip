@@ -19,7 +19,7 @@ submethod BUILD ( Str :$name, Bool :$ai, Int :$!y, Int :$!x, Int :$!ships, Int :
   my $server  = Channel.new;
   my $player1 = Channel.new;
   my $player2 = Channel.new;
-  my $action  = $server.Supply;
+  my $play    = $server.Supply;
 
 
   $ai ?? @!player.append: AI.new: :$server, events => $player1.Supply, :$speed
@@ -32,7 +32,7 @@ submethod BUILD ( Str :$name, Bool :$ai, Int :$!y, Int :$!x, Int :$!ships, Int :
 
   my $board = Board.new: :$!y, :$!x;
 
-  $!server = Server.new: :$board, :@ship, :$player1, :$player2, :$action;
+  $!server = Server.new: :$board, :@ship, :$player1, :$player2, :$play;
 
   start $!server.serve;
   sleep 1;
@@ -52,7 +52,8 @@ submethod create-ships ( ) {
     my Bool  $hidden;
     my Color $color;
 
-    $color  = Color.pick(*).sort.skip(3).head;
+    $color  = Color.pick;
+    #$color  = Color.pick(*).sort.skip(3).head;
 
     $hidden = .hidden when AI;
 

@@ -1,4 +1,6 @@
 use Battleship::Player;
+use Battleship::Play;
+use Battleship::Command;
 use Battleship::Coords;
 use Battleship::Ship;
 
@@ -15,20 +17,17 @@ has Int  $.board-x = 20;
 has Int  $.speed   = 7;
 
 
-method command ( --> Str ) {
+method command ( --> Battleship::Play ) {
   sleep 7 / $!speed;
 
-  my $command;
+  my $command = "f {(^$!board-y).roll} {(^$!board-x).roll}" ;
   my $mode = Hunt;
 
-  given $mode {
+  print 'Sorry I did not understand that, try again > '
+  until my $play = Battleship::Command.parse( $command, actions => Command::Actions.new(:$!name) ).ast;
 
-    self.hunt.tap: { $command = "f {.y} {.x}" } when Hunt;
+  $play;
 
-  }
-
-
-  $command;
 }
 
 method hunt ( Type :$type = Destroyer ) {

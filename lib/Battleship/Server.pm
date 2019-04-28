@@ -1,5 +1,9 @@
 use Battleship::Utils;
 use Battleship::Command;
+use Battleship::Play;
+use Battleship::Play::Fire;
+use Battleship::Play::Move;
+use Battleship::Play::Sink;
 use Battleship::Coords;
 use Battleship::Board;
 use Battleship::AI;
@@ -11,7 +15,7 @@ has Battleship::Ship @.ship;
 has Board            $.board;
 has Channel          $.player1;
 has Channel          $.player2;
-has Supply           $.action;
+has Supply           $.play;
 
 submethod TWEAK ( ) {
   $!board.place-ships: :@!ship;
@@ -23,51 +27,57 @@ method serve ( ) {
   my $player = @player.head;
 
   react {
-    whenever $!action {
-      when Battleship::Coords {
-      $player.send($!board.cell[.y][.x].sym ~~ '■' ?? Hit !! Miss);
+    whenever $!play -> Battleship::Play $play {
+
+      my $event = self.play: :$play;
+      $player.send($event);
+
+      $!board.place-ships: :@!ship;
+      self.draw;
+
+
+      done if [eq] @!ship.map(*.owner);
 
       $player = @player.first( * !=== $player);
       $player.send(Start);
-      }
     }
 
+    sleep .1;
     $player.send(Start);
   }
 }
 
-submethod update ( ) {
 
-  $!board.place-ships: :@!ship;
-  last if [eq] @!ship.map(*.owner);
+multi method play ( Battleship::Play::Move :$play --> Event ) {
+
+  my $ship = @!ship.grep( *.owner eq $play.player ).first( *.name eq $play.ship);
+
+  $ship.move: $play.direction if $ship;
 }
 
-multi method command ( :$action where move, Str :$name, Direction :$direction, :$player ) {
+multi method play ( Battleship::Play::Fire :$play --> Event ) {
 
-      $player.moves += 1;
+  my Event $event;
+  my $sym = $!board.cell[$play.coords.y][$play.coords.x].sym;
 
-      my $ship = @!ship.grep( *.owner eq $player.name ).first( *.name eq $name );
-      $ship.move: $direction if $ship;
-}
+  if $sym eq '■' {
 
-multi method command ( :$action where fire, :$coords, :$player ) {
-
-  $player.shots += 1;
-
-  my $result = self.check-shot: :$coords;
-
-  if $result ~~ Hit {
-
-    $player.hits += 1;
-
-    my $ship  = @!ship.first({ so any(.coords) eqv $coords });
-    my $part = $ship.part.first({ .coords eqv $coords });
+    my $ship  = @!ship.first({ so any(.coords) eqv $play.coords });
+    my $part  = $ship.part.first({ .coords eqv $play.coords });
 
     $part.hit   = True;
     $part.color = black;
-
     @!ship .= grep: not * eqv $ship if all $ship.part.map(*.hit);
+    # check if own ship
+    
+    $event = Hit;
   }
+  else {
+    $event = Miss;
+  }
+
+  $event;
+
 }
 
 
@@ -82,13 +92,5 @@ method draw ( ) {
   say '';
 
   }
-
-method check-shot ( Battleship::Coords :$coords --> Fire ) {
-
-  my $sym = $!board.cell[$coords.y][$coords.x].sym;
-
-  return Hit if  $sym eq '■';
-  return Miss;
-}
 
 sub clear { print qx[clear] }

@@ -3,7 +3,7 @@ use Battleship::Coords;
 
 unit module Battleship::Utils;
 
-enum Fire        is export < Start Miss Hit >;
+enum Event       is export < Start Miss Hit FriendlyFire Collision Escape Won Lost >;
 enum Orientation is export < Horizontal Vertical Diagonal >;
 
 
