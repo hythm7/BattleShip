@@ -16,10 +16,10 @@ has Channel $.server is rw;
 has Supply  $.events is rw;
 
 method play {
+
   react {
     whenever $!events {
       when Start {
-        #sleep .2;
         $!server.send: self.command;
       }
       when Hit {

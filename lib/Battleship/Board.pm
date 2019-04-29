@@ -5,7 +5,7 @@ unit class Board;
 
 my class Cell {
 
-  constant water      = '~';
+  constant water      = '～';
 
   has Str   $.sym    = water;
   has Color $.color  = cyan;

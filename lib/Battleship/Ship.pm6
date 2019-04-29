@@ -15,7 +15,7 @@ unit class Battleship::Ship;
 
 my class Part {
 
-  has Str   $.shape  is rw  = '■';
+  has Str   $.shape  is rw  = '＠';
   has Color $.color  is rw;
   has Bool  $.hit    is rw  = False;
   has Bool  $.hidden        = False;
@@ -41,7 +41,7 @@ has State $!state;
 
 submethod TWEAK ( ) {
 
-  my $shape = '■';
+  my $shape = '＠';
   my $name  = Name.pick;
 
   @!part.append: Part.new: :$shape, :$!color, :$!hidden for ^$!type;

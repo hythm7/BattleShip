@@ -35,10 +35,8 @@ submethod BUILD ( Str :$name, Bool :$ai, Int :$!y, Int :$!x, Int :$!ships, Int :
   $!server = Server.new: :$board, :@ship, :$player1, :$player2, :$play;
 
   start $!server.serve;
-  sleep 1;
-  start @!player.head.play; 
-  sleep 1;
-  @!player.tail.play; 
+  start @!player.head.play;
+  @!player.tail.play;
 
 }
 
@@ -52,8 +50,8 @@ submethod create-ships ( ) {
     my Bool  $hidden;
     my Color $color;
 
-    $color  = Color.pick;
-    #$color  = Color.pick(*).sort.skip(3).head;
+    #$color  = Color.pick;
+    $color  = Color.pick(*).sort.skip(3).head;
 
     $hidden = .hidden when AI;
 
