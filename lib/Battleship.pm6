@@ -1,3 +1,4 @@
+use Battleship::UI;
 use Battleship::Utils;
 use Battleship::Board;
 use Battleship::Server;
@@ -11,6 +12,7 @@ has Int    $.y;
 has Int    $.ships;
 has Int    $.speed;
 has Bool   $.hidden;
+has UI     $!ui;
 has Server $!server;
 has Player @!player;
 
@@ -33,6 +35,9 @@ submethod BUILD ( Str :$name, Bool :$ai, Int :$!y, Int :$!x, Int :$!ships, Int :
   my $board = Board.new: :$!y, :$!x;
 
   $!server = Server.new: :$board, :@ship, :$player1, :$player2, :$play;
+
+  $!ui = UI.new: y => 7, x => 7, w => 442, h => 442;
+  $!ui.build-layout;
 
   start $!server.serve;
   start @!player.head.play;

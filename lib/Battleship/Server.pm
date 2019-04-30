@@ -1,5 +1,3 @@
-no precompilation;
-use Terminal::Print <T>;
 use Battleship::Utils;
 use Battleship::Command;
 use Battleship::Play;
@@ -22,8 +20,6 @@ has Supply           $.play;
 
 method serve ( ) {
 
-  T.initialize-screen;
-
   $!board.place-ships: :@!ship;
 
   my @player = $!player1, $!player2;
@@ -38,7 +34,7 @@ method serve ( ) {
       $player.send($event);
 
       $!board.place-ships: :@!ship;
-      self.draw;
+      #self.draw;
 
       done if [eq] @!ship.map(*.owner);
 
@@ -50,7 +46,6 @@ method serve ( ) {
     $player.send(Start);
   }
 
-    T.shutdown-screen;
 }
 
 
@@ -93,7 +88,7 @@ method draw ( ) {
 
 for (^$!board.y X ^$!board.x) -> [$y, $x] {
 
-  T.change-cell: $y, $x, $!board.cell[$y][$x].Str;
+  #T.change-cell: $y, $x, $!board.cell[$y][$x].Str;
 
 }
 
@@ -101,7 +96,7 @@ for (^$!board.y X ^$!board.x) -> [$y, $x] {
   say '';
   # clear;
 
-  print T;
+#  print T;
 
   say '';
   say '';
