@@ -5,11 +5,19 @@ unit class Battleship::UI::Ocean;
   also is   Terminal::Print::Widget;
   also does Terminal::Print::BoxDrawing;
 
-method draw ( ) {
-
+method TWEAK ( ) {
 
   self.draw-box(0, 0, $.w - 1, $.h - 1);
-  self.composite(:print);
+
+}
+
+method update ( :@cell ) {
+
+  for $.grid.indices -> [$y, $x] {
+    $.grid.change-cell: $y, $x, @cell[$y][$x].Str;
+  }
+
+  self.composite: :print;
 
 }
 

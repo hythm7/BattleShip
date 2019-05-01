@@ -21,7 +21,7 @@ submethod BUILD ( Str :$name, Bool :$ai, Int :$!y, Int :$!x, Int :$!ships, Int :
   my $server  = Channel.new;
   my $player1 = Channel.new;
   my $player2 = Channel.new;
-  my $play    = $server.Supply;
+  my $ui      = Channel.new;
 
 
   $ai ?? @!player.append: AI.new: :$server, events => $player1.Supply, :$speed
@@ -34,11 +34,11 @@ submethod BUILD ( Str :$name, Bool :$ai, Int :$!y, Int :$!x, Int :$!ships, Int :
 
   my $board = Board.new: :$!y, :$!x;
 
-  $!server = Server.new: :$board, :@ship, :$player1, :$player2, :$play;
+  $!server = Server.new: :$board, :@ship, :$player1, :$player2, :$ui, play => $server.Supply;
 
-  $!ui = UI.new: y => 7, x => 7, w => 442, h => 442;
-  $!ui.build-layout;
+  $!ui = UI.new: update => $ui.Supply;
 
+  start $!ui.display;
   start $!server.serve;
   start @!player.head.play;
   @!player.tail.play;

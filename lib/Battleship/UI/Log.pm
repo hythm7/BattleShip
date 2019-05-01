@@ -1,13 +1,13 @@
 use Terminal::Print::Widget;
 use Terminal::Print::BoxDrawing;
 
-unit class Battleship::UI::Player;
+unit class Battleship::UI::Log;
   also is   Terminal::Print::Widget;
   also does Terminal::Print::BoxDrawing;
 
-
 method TWEAK ( ) {
 
-  self.draw-box( 0, 0, $.w - 1, $.h - 1 );
+  self.draw-box(0, 0, $.w - 1, $.h - 1);
 
 }
+

@@ -1,38 +1,56 @@
+no precompilation;
 use Terminal::Print <T>;
 use Terminal::Print::Widget;
 use Terminal::Print::BoxDrawing;
 use Battleship::UI::Player;
 use Battleship::UI::Ocean;
+use Battleship::UI::Command;
+use Battleship::UI::Log;
 
 unit class Battleship::UI;
   also is   Terminal::Print::Widget;
   also does Terminal::Print::BoxDrawing;
 
-has Battleship::UI::Player  $.player1;
-has Battleship::UI::Player  $.player2;
-has Battleship::UI::Ocean   $.ocean;
-#has Battleship::UI::Command $.command;
-#has Battleship::UI::Log     $.log;
+has Player  $.player1;
+has Player  $.player2;
+has Ocean   $.ocean;
+has Command $.command;
+has Log     $.log;
+has Supply  $.update;
+
+method new ( :$update ) {
+  self.bless: y => 0, x => 0, w => w, h => h, :$update;
+}
+
+submethod TWEAK ( ) {
 
 
-method build-layout ( ) {
+  $!player1 = Player.new:  :x(0),           :y(0),           :w(w div 4), :h(3 * h div 4),  :parent(self);
+  $!ocean   = Ocean.new:   :x(w div 4),     :y(0),           :w(20), :h(20),  :parent(self);
+  $!player2 = Player.new:  :x(3 * w div 4), :y(0),           :w(w div 4), :h(3 * h div 4),  :parent(self);
+  $!log     = Log.new:     :x(0),           :y(3 * h div 4), :w(w),       :h((h div 4) - 3),:parent(self);
+  $!command = Command.new: :x(0),           :y(h - 3),       :w(w),       :h(3),            :parent(self);
 
-  #T.initialize-screen;
-  T.add-grid: 'main', new-grid => $.grid;
+  self.children>>.composite: :print;
+}
 
-  T.switch-grid('main');
 
-  $!player1 = Battleship::UI::Player.new: y =>  0, x =>  0, w =>  7, h => 20, parent => self;
-  $!player2 = Battleship::UI::Player.new: y =>  0, x => 30, w =>  7, h => 20, parent => self;
-  $!ocean   = Battleship::UI::Ocean.new:  y =>  0, x =>  9, w => 20, h => 20, parent => self;
-  #$!command = ViewPort.new: y => 21, x =>  0, w => 20, h =>  4, parent => self;
-  #$!log     = ViewPort.new: y => 26, x =>  0, w => 20, h => 20, parent => self;
+method display ( ) {
 
-#  $!player1.draw;
-#  $!player2.draw;
-#  $!ocean.draw;
+  T.initialize-screen;
 
-  #self.composite;
+  self.composite: :print;
+
+  react {
+
+    whenever $!update -> @cell {
+
+      $!ocean.update: :@cell;
+
+    }
+  }
+
+  T.shutdown-screen;
 }
 
 

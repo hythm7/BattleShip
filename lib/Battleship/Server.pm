@@ -15,6 +15,7 @@ has Battleship::Ship @.ship;
 has Board            $.board;
 has Channel          $.player1;
 has Channel          $.player2;
+has Channel          $.ui;
 has Supply           $.play;
 
 
@@ -34,7 +35,6 @@ method serve ( ) {
       $player.send($event);
 
       $!board.place-ships: :@!ship;
-      #self.draw;
 
       done if [eq] @!ship.map(*.owner);
 
@@ -78,6 +78,8 @@ multi method play ( Battleship::Play::Fire :$play --> Event ) {
   else {
     $event = Miss;
   }
+
+  $!ui.send: $!board.cell;
 
   $event;
 
