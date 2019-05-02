@@ -12,21 +12,28 @@ has Int $.moves  is rw = 0;
 
 has Battleship::Ship @.ship;
 
-has Channel $.server is rw;
-has Supply  $.events is rw;
+has Channel $.server;
+has Channel $.ui;
+has Supply  $.events;
 
 method play {
 
   react {
     whenever $!events {
+
+
       when Start {
+        $!shots += 1;
         $!server.send: self.command;
       }
       when Hit {
-        #say "I hit that! +1 gold coin!";
+
+        $!hits += 1;
+        self.update-ui;
+
       }
       when Miss {
-        #say "No, that's a miss... -1 bullet!";
+        self.update-ui;
       }
       when Won {
         done;
@@ -44,5 +51,11 @@ method command ( --> Battleship::Play ) {
   until my $play = Battleship::Command.parse( get, actions => Command::Actions.new(:$!name) ).ast;
 
   $play;
+
+}
+
+method update-ui ( ) {
+
+  $!ui.send: Battleship::Utils::PlayerData.new: :$.name, :$.shots, :$.hits;
 
 }

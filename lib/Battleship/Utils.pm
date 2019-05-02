@@ -7,6 +7,16 @@ enum Event       is export < Start Miss Hit FriendlyFire Collision Escape Won Lo
 enum Orientation is export < Horizontal Vertical Diagonal >;
 
 
+class OceanData {
+  has @.cell;
+}
+
+class PlayerData {
+  has $.name;
+  has $.shots;
+  has $.hits;
+}
+
 sub set-ships-coords (:@ship, :$y, :$x ) is export {
 
   for @ship -> $ship {

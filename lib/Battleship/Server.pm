@@ -79,7 +79,7 @@ multi method play ( Battleship::Play::Fire :$play --> Event ) {
     $event = Miss;
   }
 
-  $!ui.send: $!board.cell;
+  $!ui.send: Battleship::Utils::OceanData.new: cell => $!board.cell;
 
   $event;
 

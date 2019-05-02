@@ -11,10 +11,10 @@ method TWEAK ( ) {
 
 }
 
-method update ( :@cell ) {
+method update ( :$data ) {
 
   for $.grid.indices -> [$y, $x] {
-    $.grid.change-cell: $y, $x, @cell[$y][$x].Str;
+    $.grid.change-cell: $y, $x, $data.cell[$y][$x].Str;
   }
 
   self.composite: :print;

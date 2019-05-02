@@ -24,10 +24,10 @@ submethod BUILD ( Str :$name, Bool :$ai, Int :$!y, Int :$!x, Int :$!ships, Int :
   my $ui      = Channel.new;
 
 
-  $ai ?? @!player.append: AI.new: :$server, events => $player1.Supply, :$speed
-      !! @!player.append: Player.new: :$name, :$server, events => $player1.Supply;
+  $ai ?? @!player.append: AI.new: :$server, :$ui, events => $player1.Supply, :$speed
+      !! @!player.append: Player.new: :$name, :$server, :$ui, events => $player1.Supply;
 
-  @!player.append: AI.new: :$server, events => $player2.Supply, :$speed, :$hidden;
+  @!player.append: AI.new: :$server, :$ui, events => $player2.Supply, :$speed, :$hidden;
 
   my @ship = self.create-ships: :@!player, :$!y, :$!x;
   set-ships-coords :@ship, :$!y, :$!x;
@@ -36,7 +36,7 @@ submethod BUILD ( Str :$name, Bool :$ai, Int :$!y, Int :$!x, Int :$!ships, Int :
 
   $!server = Server.new: :$board, :@ship, :$player1, :$player2, :$ui, play => $server.Supply;
 
-  $!ui = UI.new: update => $ui.Supply;
+  $!ui = UI.new: updates => $ui.Supply, player1 => @!player.head.name, player2 => @!player.tail.name;
 
   start $!ui.display;
   start $!server.serve;
