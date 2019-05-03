@@ -30,6 +30,7 @@ method play {
 
         $!hits += 1;
         self.update-ui;
+        $!ui.send: Battleship::Utils::Tweet.new: author => $.name, tweet => 'Yay hit';
 
       }
       when Miss {

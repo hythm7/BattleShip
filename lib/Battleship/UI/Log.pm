@@ -11,3 +11,10 @@ method TWEAK ( ) {
 
 }
 
+method update ( :$data ) {
+
+  $.grid.set-span-text: 1, 1, "{$data.author}: {$data.tweet}";
+
+  self.composite: :print;
+
+}

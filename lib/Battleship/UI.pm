@@ -66,4 +66,8 @@ multi method update ( Battleship::Utils::PlayerData :$data ) {
   ($!player1, $!player2).first( *.name eq $data.name).update: :$data;
 
 }
+multi method update ( Battleship::Utils::Tweet :$data ) {
 
+  $!log.update: :$data;
+
+}

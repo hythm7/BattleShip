@@ -43,6 +43,7 @@ method serve ( ) {
 
     }
 
+    #sleep .2;
     $player.send(Start);
   }
 

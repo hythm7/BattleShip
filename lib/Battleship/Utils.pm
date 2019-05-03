@@ -12,9 +12,14 @@ class OceanData {
 }
 
 class PlayerData {
-  has $.name;
-  has $.shots;
-  has $.hits;
+  has Str $.name;
+  has Int $.shots;
+  has Int $.hits;
+}
+
+class Tweet {
+  has Str $.author;
+  has Str $.tweet;
 }
 
 sub set-ships-coords (:@ship, :$y, :$x ) is export {
