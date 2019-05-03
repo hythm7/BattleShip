@@ -3,20 +3,22 @@ use Terminal::Print <T>;
 use Terminal::Print::Widget;
 use Terminal::Print::BoxDrawing;
 use Battleship::Utils;
+use Battleship::UI::Title;
 use Battleship::UI::Player;
 use Battleship::UI::Ocean;
 use Battleship::UI::Command;
-use Battleship::UI::Log;
+use Battleship::UI::Tweet;
 
 unit class Battleship::UI;
   also is   Terminal::Print::Widget;
   also does Terminal::Print::BoxDrawing;
 
+has Title   $!title;
 has Player  $!player1;
 has Player  $!player2;
 has Ocean   $!ocean;
 has Command $!command;
-has Log     $!log;
+has Tweet   $!tweet;
 has Supply  $.updates;
 
 method new ( :$updates, :$player1, :$player2  ) {
@@ -26,11 +28,12 @@ method new ( :$updates, :$player1, :$player2  ) {
 submethod BUILD ( :$!updates, :$player1, :$player2 ) {
 
 
-  $!player1 = Player.new:  :name($player1), :x(0), :y(0), :w(w div 4), :h(3 * h div 4), :parent(self);
-  $!ocean   = Ocean.new:   :x(w div 4), :y(0), :w(20), :h(20),  :parent(self);
-  $!player2 = Player.new:  :name($player2), :x(3 * w div 4), :y(0), :w(w div 4), :h(3 * h div 4), :parent(self);
-  $!log     = Log.new:     :x(0), :y(3 * h div 4), :w(w), :h((h div 4) - 3),:parent(self);
-  $!command = Command.new: :x(0), :y(h - 3), :w(w), :h(3), :parent(self);
+  $!title   = Title.new:   :x(0),            :y(0),  :w(w),  :h(7),      :parent(self);
+  $!player1 = Player.new:  :x(0),            :y(8),  :w(14), :h(20),     :parent(self), :name($player1);
+  $!player2 = Player.new:  :x(w - 14),       :y(8),  :w(14), :h(20),     :parent(self), :name($player2);
+  $!ocean   = Ocean.new:   :x(w div 2 - 20), :y(8),  :w(20), :h(20),     :parent(self);
+  $!command = Command.new: :x(0),            :y(30), :w(w),  :h(3),      :parent(self);
+  $!tweet   = Tweet.new:   :x(0),            :y(34), :w(w),  :h(h - 34), :parent(self);
 
   self.children>>.composite: :print;
 }
@@ -68,6 +71,6 @@ multi method update ( Battleship::Utils::PlayerData :$data ) {
 }
 multi method update ( Battleship::Utils::Tweet :$data ) {
 
-  $!log.update: :$data;
+  $!tweet.update: :$data;
 
 }

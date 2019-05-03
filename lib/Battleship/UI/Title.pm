@@ -1,7 +1,7 @@
 use Terminal::Print::Widget;
 use Terminal::Print::BoxDrawing;
 
-unit class Battleship::UI::Log;
+unit class Battleship::UI::Title;
   also is   Terminal::Print::Widget;
   also does Terminal::Print::BoxDrawing;
 
@@ -11,10 +11,3 @@ method TWEAK ( ) {
 
 }
 
-method update ( :$data ) {
-
-  $.grid.set-span-text: 1, 1, "{$data.author}: {$data.tweet}";
-
-  self.composite: :print;
-
-}
