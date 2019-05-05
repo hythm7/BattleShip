@@ -1,3 +1,4 @@
+use Battleship::Utils;
 use Terminal::Print::DecodedInput;
 use Terminal::Print::Widget;
 use Terminal::Print::BoxDrawing;
@@ -8,13 +9,16 @@ unit class Battleship::UI::Command;
 
 method TWEAK ( ) {
   self.draw-box(0, 0, $.w - 1, $.h - 1);
-  $.grid.change-cell: 1, 1, '> ';
+  $.grid.set-span-text: 1, 1, '>';
 
   start self.read-input;
 }
 
 method update ( Str :$cmd ) {
-  $.grid.set-span-text: 2, 1, $cmd;
+  $.grid.clear;
+  self.draw-box(0, 0, $.w - 1, $.h - 1);
+  $.grid.set-span-text: 1, 1, '>';
+  $.grid.set-span-text: 3, 1, $cmd;
   self.composite: :print;
 }
 
@@ -26,11 +30,18 @@ method read-input {
         state $cmd;
 
         if $c ~~ Str {
-            $cmd ~= $c;
             my $char = $c.ord < 32 ?? '^' ~ ($c.ord + 64).chr !! $c;
             #printf "%s", $cmd;
+            if $char eq '^M' {
+              self.parent.update: data => Battleship::Utils::Tweet.new(author => 'hythm', tweet => $cmd);
+              $char = '';
+              $cmd = '';
+            }
+
+            done if $char eq '^C';
+
+            $cmd ~= $char;
             self.update: :$cmd;
-            done if $c eq 'q';
         }
         elsif $c ~~ Terminal::Print::DecodedInput::ModifiedSpecialKey {
             my @mods = ('Meta' if $c.meta), ('Control' if $c.control),

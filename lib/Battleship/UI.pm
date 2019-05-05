@@ -58,6 +58,14 @@ method display ( ) {
 }
 
 
+multi method koko ( Int :$data ) { 'int' }
+
+multi method koko ( Battleship::Utils::Tweet :$data ) {
+  $!tweet.update: :$data;
+}
+
+multi method koko ( Str :$data) { 'str!' }
+
 multi method update ( Battleship::Utils::OceanData :$data ) {
 
   $!ocean.update: :$data;
@@ -74,3 +82,4 @@ multi method update ( Battleship::Utils::Tweet :$data ) {
   $!tweet.update: :$data;
 
 }
+
